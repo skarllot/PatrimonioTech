@@ -6,9 +6,9 @@ namespace PatrimonioTech.Gui;
 
 public class ViewLocator : IDataTemplate
 {
-    public Control Build(object? data)
+    public Control Build(object? param)
     {
-        string? name = data?.GetType().FullName!.Replace("ViewModel", "View");
+        string? name = param?.GetType().FullName!.Replace("ViewModel", "View");
         var type = name is not null ? Type.GetType(name) : null;
 
         if (type != null)

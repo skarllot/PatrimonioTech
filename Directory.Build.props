@@ -1,0 +1,23 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <SolutionDir Condition="'$(SolutionDir)' == ''">$(MSBuildThisFileDirectory)</SolutionDir>
+    <PackageOutputPath>$(SolutionDir)artifacts</PackageOutputPath>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>Recommended</AnalysisMode>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Fabricio Godoy</Authors>
+    <Copyright>Copyright © Fabricio Godoy</Copyright>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <NeutralLanguage>en</NeutralLanguage>
+    <RepositoryUrl>https://github.com/skarllot/PatrimonioTech</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/skarllot/PatrimonioTech</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>

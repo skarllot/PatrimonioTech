@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{2EF47CDB
 		.gitignore = .gitignore
 		LICENSE = LICENSE
 		README.md = README.md
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BDEBF126-A5BF-4588-9C17-34BE823F7DC6}"
@@ -17,6 +18,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.Gui.Desktop", "src\PatrimonioTech.Gui.Desktop\PatrimonioTech.Gui.Desktop.csproj", "{70D09FAD-F953-40C9-A7DF-D4911B53ADBC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.Gui", "src\PatrimonioTech.Gui\PatrimonioTech.Gui.csproj", "{6E6A1A61-C110-4D79-8544-FC98A7A74788}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.Domain", "src\PatrimonioTech.Domain\PatrimonioTech.Domain.csproj", "{CE84AD72-A0CE-47F0-AD95-75B820EECC3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.App", "src\PatrimonioTech.App\PatrimonioTech.App.csproj", "{CDC454EA-D4B3-4D39-8452-2474E9F94290}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.Infra", "src\PatrimonioTech.Infra\PatrimonioTech.Infra.csproj", "{8CBD0A75-88B3-4C30-ACD4-476E9515DDAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +36,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{70D09FAD-F953-40C9-A7DF-D4911B53ADBC} = {BDEBF126-A5BF-4588-9C17-34BE823F7DC6}
 		{6E6A1A61-C110-4D79-8544-FC98A7A74788} = {BDEBF126-A5BF-4588-9C17-34BE823F7DC6}
+		{CE84AD72-A0CE-47F0-AD95-75B820EECC3F} = {BDEBF126-A5BF-4588-9C17-34BE823F7DC6}
+		{CDC454EA-D4B3-4D39-8452-2474E9F94290} = {BDEBF126-A5BF-4588-9C17-34BE823F7DC6}
+		{8CBD0A75-88B3-4C30-ACD4-476E9515DDAB} = {BDEBF126-A5BF-4588-9C17-34BE823F7DC6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{70D09FAD-F953-40C9-A7DF-D4911B53ADBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -39,5 +49,17 @@ Global
 		{6E6A1A61-C110-4D79-8544-FC98A7A74788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E6A1A61-C110-4D79-8544-FC98A7A74788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E6A1A61-C110-4D79-8544-FC98A7A74788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE84AD72-A0CE-47F0-AD95-75B820EECC3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE84AD72-A0CE-47F0-AD95-75B820EECC3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE84AD72-A0CE-47F0-AD95-75B820EECC3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE84AD72-A0CE-47F0-AD95-75B820EECC3F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDC454EA-D4B3-4D39-8452-2474E9F94290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDC454EA-D4B3-4D39-8452-2474E9F94290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDC454EA-D4B3-4D39-8452-2474E9F94290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDC454EA-D4B3-4D39-8452-2474E9F94290}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CBD0A75-88B3-4C30-ACD4-476E9515DDAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CBD0A75-88B3-4C30-ACD4-476E9515DDAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CBD0A75-88B3-4C30-ACD4-476E9515DDAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CBD0A75-88B3-4C30-ACD4-476E9515DDAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
