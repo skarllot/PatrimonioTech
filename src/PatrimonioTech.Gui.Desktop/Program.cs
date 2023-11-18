@@ -1,8 +1,8 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.ReactiveUI;
-using System;
 
-namespace PatrimonioTech;
+namespace PatrimonioTech.Gui.Desktop;
 
 public static class Program
 {

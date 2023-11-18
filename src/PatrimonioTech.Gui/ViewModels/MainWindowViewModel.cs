@@ -1,4 +1,4 @@
-﻿namespace PatrimonioTech.ViewModels;
+﻿namespace PatrimonioTech.Gui.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {

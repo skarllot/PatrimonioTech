@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using PatrimonioTech.ViewModels;
+using PatrimonioTech.Gui.ViewModels;
 
-namespace PatrimonioTech;
+namespace PatrimonioTech.Gui;
 
 public class ViewLocator : IDataTemplate
 {

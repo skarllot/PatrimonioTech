@@ -19,6 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\PatrimonioTech.App\PatrimonioTech.App.csproj" />
+      <ProjectReference Include="..\PatrimonioTech.Gui\PatrimonioTech.Gui.csproj" />
     </ItemGroup>
 </Project>

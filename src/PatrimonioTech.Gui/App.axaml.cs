@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using PatrimonioTech.ViewModels;
-using PatrimonioTech.Views;
+using PatrimonioTech.Gui.ViewModels;
+using PatrimonioTech.Gui.Views;
 
-namespace PatrimonioTech;
+namespace PatrimonioTech.Gui;
 
 public partial class App : Application
 {

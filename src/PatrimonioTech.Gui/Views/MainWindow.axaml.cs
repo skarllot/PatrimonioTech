@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace PatrimonioTech.Views;
+namespace PatrimonioTech.Gui.Views;
 
 public partial class MainWindow : Window
 {
