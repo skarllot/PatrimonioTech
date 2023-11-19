@@ -16,9 +16,12 @@
         <PackageReference Include="Avalonia.Desktop" Version="11.0.5" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.5" />
+        <PackageReference Include="Jab" Version="0.8.6" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\PatrimonioTech.Gui\PatrimonioTech.Gui.csproj" />
+      <ProjectReference Include="..\PatrimonioTech.Infra\PatrimonioTech.Infra.csproj" />
     </ItemGroup>
 </Project>
