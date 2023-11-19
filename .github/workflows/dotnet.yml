@@ -35,7 +35,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
 
     - name: Setup NuGet cache
       uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
@@ -55,5 +55,6 @@ jobs:
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
+      if: false
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
