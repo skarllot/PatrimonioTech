@@ -12,10 +12,16 @@ namespace PatrimonioTech.Gui.Desktop.DependencyInjection;
 [Import<IInfraModule>]
 [Singleton<ILoggerProvider>(Factory = nameof(CreateConsoleLoggerProvider))]
 [Transient<LogLevel>(Factory = nameof(GetLogLevel))]
+
+// GUI
+[Transient<App>]
+[Singleton<IFactory<App>, ContainerFactory<App>>]
+
+// Program
 [Singleton<Program>]
-public sealed partial class DesktopContainer(LogLevel logLevel)
+public sealed partial class DesktopContainer
 {
-    private LogLevel GetLogLevel() => logLevel;
+    private static LogLevel GetLogLevel() => LogLevel.Information;
 
     private static ConsoleLoggerProvider CreateConsoleLoggerProvider(
         IOptionsMonitor<ConsoleLoggerOptions> options,

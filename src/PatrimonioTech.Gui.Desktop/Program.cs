@@ -1,37 +1,30 @@
 ﻿using Avalonia;
 using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using PatrimonioTech.App.Credentials.v1.AddUser;
 using PatrimonioTech.Gui.Desktop.DependencyInjection;
 
 namespace PatrimonioTech.Gui.Desktop;
 
-public class Program(ICredentialAddUserUseCase credentialAddUserUseCase)
+public class Program(IFactory<App> appFactory)
 {
-    public async Task Run(string[] args)
-    {
-        await credentialAddUserUseCase.Execute(
-            new CredentialAddUserRequest("Fabricio", "securepassword"),
-            CancellationToken.None);
-
-        BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
-    }
-
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
-    public static async Task Main(string[] args)
+    public static int Main(string[] args)
     {
-        var container = new DesktopContainer(LogLevel.Information);
-        await container.GetRequiredService<Program>().Run(args);
+        return new DesktopContainer()
+            .GetRequiredService<Program>()
+            .Run(args);
     }
 
+    public int Run(string[] args) =>
+        BuildAvaloniaApp(appFactory)
+            .StartWithClassicDesktopLifetime(args);
+
     // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+    public static AppBuilder BuildAvaloniaApp(IFactory<App> appFactory)
+        => AppBuilder.Configure(appFactory.Create)
             .UsePlatformDetect()
             .LogToTrace()
             .UseReactiveUI();
