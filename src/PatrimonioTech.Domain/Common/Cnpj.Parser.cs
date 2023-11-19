@@ -21,16 +21,15 @@ public readonly partial struct Cnpj
 
         private static bool ValidateModulus(ReadOnlySpan<char> value)
         {
-            ReadOnlySpan<int> mult1 = stackalloc int[12] { 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
-            ReadOnlySpan<int> mult2 = stackalloc int[12] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3 };
+            ReadOnlySpan<int> mult = stackalloc int[13] { 6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2 };
 
             int v1 = 0;
             int v2 = 0;
             for (int i = 0; i < 12; i++)
             {
                 int currentDigit = value[i] - '0';
-                v1 += currentDigit * mult1[i];
-                v2 += currentDigit * mult2[i];
+                v1 += currentDigit * mult[i + 1];
+                v2 += currentDigit * mult[i];
             }
 
             v1 = v1 % 11 < 2 ? 0 : 11 - (v1 % 11);
