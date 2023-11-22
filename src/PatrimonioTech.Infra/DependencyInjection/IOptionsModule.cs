@@ -11,11 +11,11 @@ namespace PatrimonioTech.Infra.DependencyInjection;
 [Singleton(typeof(IOptionsMonitorCache<>), typeof(OptionsCache<>))]
 public interface IOptionsModule
 {
-    public static IConfigureOptions<TOptions> Configure<TOptions>(Action<TOptions> configure)
+    public static IConfigureOptions<TOptions> Configure<TOptions>(Action<TOptions>? configure = null)
         where TOptions : class =>
         Configure(Options.DefaultName, configure);
 
-    public static IConfigureOptions<TOptions> Configure<TOptions>(string name, Action<TOptions> configure)
+    public static IConfigureOptions<TOptions> Configure<TOptions>(string? name, Action<TOptions>? configure)
         where TOptions : class =>
         new ConfigureNamedOptions<TOptions>(name, configure);
 }

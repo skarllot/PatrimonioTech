@@ -10,8 +10,8 @@ namespace PatrimonioTech.Gui.Desktop.DependencyInjection;
 [ServiceProvider]
 [Import<IAppModule>]
 [Import<IInfraModule>]
-[Singleton<ILoggerProvider>(Factory = nameof(CreateConsoleLoggerProvider))]
-[Transient<LogLevel>(Factory = nameof(GetLogLevel))]
+[Singleton<ILoggerProvider, ConsoleLoggerProvider>]
+[Singleton<IConfigureOptions<LoggerFilterOptions>>(Factory = nameof(ConfigureLoggerFilterOptions))]
 
 // GUI
 [Transient<App>]
@@ -19,12 +19,8 @@ namespace PatrimonioTech.Gui.Desktop.DependencyInjection;
 
 // Program
 [Singleton<Program>]
-public sealed partial class DesktopContainer
+public sealed partial class DesktopContainer(Action<LoggerFilterOptions>? loggerFilterOptions = null)
 {
-    private static LogLevel GetLogLevel() => LogLevel.Information;
-
-    private static ConsoleLoggerProvider CreateConsoleLoggerProvider(
-        IOptionsMonitor<ConsoleLoggerOptions> options,
-        IEnumerable<ConsoleFormatter> formatters) =>
-        new ConsoleLoggerProvider(options, formatters);
+    private IConfigureOptions<LoggerFilterOptions> ConfigureLoggerFilterOptions() =>
+        ILoggingModule.ConfigureFilterOptions(loggerFilterOptions);
 }
