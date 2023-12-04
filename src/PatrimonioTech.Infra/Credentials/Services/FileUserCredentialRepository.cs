@@ -1,11 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
 using LanguageExt;
-using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PatrimonioTech.Domain.Credentials;
-using PatrimonioTech.Domain.Credentials.Errors;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Infra.Credentials.Services;
@@ -30,14 +28,14 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
         _configFile = Path.Combine(_appData, options.Value.FileName);
     }
 
-    public async Task<Result<Unit>> Add(UserCredential userCredential, CancellationToken cancellationToken)
+    public async Task<Either<UserCredentialAddError, Unit>> Add(UserCredential userCredential, CancellationToken cancellationToken)
     {
         var current = await Read(cancellationToken).ConfigureAwait(false);
 
         if (current.Exists(u => u.Name.Equals(userCredential.Name, StringComparison.OrdinalIgnoreCase)))
         {
             LogUserAlreadyExists(userCredential.Name);
-            return new Result<Unit>(new UserCredentialAlreadyExistsException(userCredential.Name));
+            return new UserCredentialAddError.NameAlreadyExists(userCredential.Name);
         }
 
         current.Add(userCredential);

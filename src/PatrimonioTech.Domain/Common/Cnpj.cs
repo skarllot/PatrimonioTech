@@ -1,4 +1,5 @@
 ﻿using Vogen;
+using Validation = Vogen.Validation;
 
 namespace PatrimonioTech.Domain.Common;
 

@@ -1,14 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="LanguageExt.Core" Version="4.4.7" />
-      <PackageReference Include="Vogen" Version="3.0.23" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AutomaticInterface" Version="1.6.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Dunet" Version="1.10.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Jab" Version="0.8.7" />
+    <PackageReference Include="LanguageExt.Core" Version="4.4.7" />
+    <PackageReference Include="Vogen" Version="3.0.23" />
+  </ItemGroup>
 
+  <ItemGroup>
+    <DotNetCliToolReference Include="dotnet-codegen" Version="0.6.1" />
+  </ItemGroup>
 </Project>

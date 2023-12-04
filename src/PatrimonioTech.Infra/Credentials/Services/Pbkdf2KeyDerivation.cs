@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
-using LanguageExt.Common;
+using LanguageExt;
+using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Infra.Credentials.Services;
@@ -11,7 +12,7 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
     private const int AesMaxIvSize = 128;
     private static readonly HashAlgorithmName s_hashAlgorithmName = HashAlgorithmName.SHA512;
 
-    public (string Salt, string EncryptedKey) CreateKey(string password, int keySize, int iterations)
+    public CreateKeyResult CreateKey(Password password, int keySize, int iterations)
     {
         Span<byte> binarySalt = stackalloc byte[keySize / BitsPerByte];
         RandomNumberGenerator.Fill(binarySalt);
@@ -20,7 +21,7 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
         RandomNumberGenerator.Fill(binaryKey);
 
         byte[] binaryHash = new byte[AesMaxKeySize / BitsPerByte];
-        Rfc2898DeriveBytes.Pbkdf2(password, binarySalt, binaryHash, iterations, s_hashAlgorithmName);
+        Rfc2898DeriveBytes.Pbkdf2(password.Value, binarySalt, binaryHash, iterations, s_hashAlgorithmName);
 
         Span<byte> encrypted = stackalloc byte[keySize];
 
@@ -28,10 +29,12 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
         aes.Key = binaryHash;
         int writtenBytes = aes.EncryptCbc(binaryKey, binarySalt[..(AesMaxIvSize / BitsPerByte)], encrypted);
 
-        return (Convert.ToBase64String(binarySalt), Convert.ToBase64String(encrypted[..writtenBytes]));
+        return new CreateKeyResult(
+            Salt: Convert.ToBase64String(binarySalt),
+            EncryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]));
     }
 
-    public Result<string> TryGetKey(
+    public Either<GetKeyError, string> TryGetKey(
         string password,
         string salt,
         string encryptedKey,
@@ -41,13 +44,13 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
         Span<byte> binarySalt = stackalloc byte[keySize / BitsPerByte];
         if (!Convert.TryFromBase64Chars(salt, binarySalt, out int saltBytes) || saltBytes != binarySalt.Length)
         {
-            return new Result<string>(new InvalidOperationException("Invalid salt"));
+            return new GetKeyError.InvalidSalt(salt);
         }
 
         Span<byte> binaryEncrypted = stackalloc byte[keySize];
         if (!Convert.TryFromBase64Chars(encryptedKey, binaryEncrypted, out int encryptedBytes))
         {
-            return new Result<string>(new InvalidOperationException("Invalid encrypted key"));
+            return new GetKeyError.InvalidEncryptedKey(encryptedKey);
         }
 
         byte[] binaryHash = new byte[AesMaxKeySize / BitsPerByte];
@@ -57,7 +60,10 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
 
         using Aes aes = Aes.Create();
         aes.Key = binaryHash;
-        int keyBytes = aes.DecryptCbc(binaryEncrypted[..encryptedBytes], binarySalt[..(AesMaxIvSize / BitsPerByte)], binaryKey);
+        int keyBytes = aes.DecryptCbc(
+            binaryEncrypted[..encryptedBytes],
+            binarySalt[..(AesMaxIvSize / BitsPerByte)],
+            binaryKey);
 
         return Convert.ToBase64String(binaryKey[..keyBytes]);
     }

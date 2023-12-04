@@ -3,11 +3,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Options;
 using PatrimonioTech.App.DependencyInjection;
+using PatrimonioTech.Domain.DependencyInjection;
 using PatrimonioTech.Infra.DependencyInjection;
 
 namespace PatrimonioTech.Gui.Desktop.DependencyInjection;
 
 [ServiceProvider]
+[Import<IDomainModule>]
 [Import<IAppModule>]
 [Import<IInfraModule>]
 [Singleton<ILoggerProvider, ConsoleLoggerProvider>]
