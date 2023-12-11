@@ -16,6 +16,9 @@ updates:
       xunit:
         patterns:
           - xunit*
+      Avalonia:
+        patterns:
+          - Avalonia*
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
