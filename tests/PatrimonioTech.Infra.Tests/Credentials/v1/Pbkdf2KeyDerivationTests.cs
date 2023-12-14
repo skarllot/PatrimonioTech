@@ -1,4 +1,7 @@
 ﻿using FluentAssertions;
+using FluentAssertions.LanguageExt;
+using PatrimonioTech.Domain.Credentials;
+using PatrimonioTech.Domain.Credentials.Services;
 using PatrimonioTech.Infra.Credentials.Services;
 using PatrimonioTech.Infra.Tests.Common;
 using Xunit.Abstractions;
@@ -21,11 +24,14 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     public void CreateKey_WithValidInput_ReturnsSaltAndEncryptedKey(string password, int keySize, int iterations)
     {
         //Act
-        (string salt, string encryptedKey) = _keyDerivation.CreateKey(password, keySize, iterations);
+        var result = from p in Password.Create(password)
+            select _keyDerivation.CreateKey(p, keySize, iterations);
 
         // Assert
-        Assert.NotEqual(string.Empty, salt);
-        Assert.NotEqual(string.Empty, encryptedKey);
+        (string? salt, string? encryptedKey) = result.Should().BeRight().Subject;
+
+        salt.Should().NotBeEmpty();
+        encryptedKey.Should().NotBeEmpty();
 
         outputHelper.WriteLine("Salt: {0}", salt);
         outputHelper.WriteLine("Encrypted key: {0}", encryptedKey);
@@ -36,20 +42,22 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     public void TryGetKey_WithValidInput_ReturnsKey(string password, int keySize, int iterations)
     {
         // Arrange
-        (string salt, string encryptedKey) = _keyDerivation.CreateKey(password, keySize, iterations);
+        (string salt, string encryptedKey) = (from p in Password.Create(password)
+                select _keyDerivation.CreateKey(p, keySize, iterations))
+            .First().Right;
 
         // Act
         var result1 = _keyDerivation.TryGetKey(password, salt, encryptedKey, keySize, iterations);
         var result2 = _keyDerivation.TryGetKey(password, salt, encryptedKey, keySize, iterations);
 
         // Assert
-        result1.IsSuccess.Should().BeTrue();
-        result1.IfFail("").Should().NotBeEmpty();
-        result2.IfFail("").Should().Be(result1.IfFail(""));
+        result1.Should().BeRight();
+        result1.IfLeft("").Should().NotBeEmpty();
+        result2.IfLeft("").Should().Be(result1.IfLeft(""));
 
         outputHelper.WriteLine("Salt: {0}", salt);
         outputHelper.WriteLine("Encrypted key: {0}", encryptedKey);
-        outputHelper.WriteLine("Key: {0}", result1.IfFail(""));
+        outputHelper.WriteLine("Key: {0}", result1.IfLeft(""));
     }
 
     [Theory]
@@ -64,8 +72,8 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
         var result = _keyDerivation.TryGetKey(password, salt, encryptedKey, keySize, iterations);
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Match(_ => null, e => (string?)e.Message).Should().Be("Invalid salt");
+        result.Should().BeLeft()
+            .Which.Value.Should().BeOfType<GetKeyError.InvalidSalt>();
     }
 
     [Theory]
@@ -73,13 +81,15 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     public void TryGetKey_WithInvalidEncryptedKey_ReturnsFailure(string password, int keySize, int iterations)
     {
         // Arrange
-        (string salt, string encryptedKey) = _keyDerivation.CreateKey(password, keySize, iterations);
+        (string salt, string encryptedKey) = (from p in Password.Create(password)
+                select _keyDerivation.CreateKey(p, keySize, iterations))
+            .First().Right;
 
         // Act
         var result = _keyDerivation.TryGetKey(password, salt, encryptedKey[..5], keySize, iterations);
 
         // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Match(_ => null, e => (string?)e.Message).Should().Be("Invalid encrypted key");
+        result.Should().BeLeft()
+            .Which.Value.Should().BeOfType<GetKeyError.InvalidEncryptedKey>();
     }
 }

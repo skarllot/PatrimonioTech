@@ -1,16 +1,16 @@
-﻿using Dunet;
+﻿using OneOf;
 
 namespace PatrimonioTech.Domain.Credentials.Services;
 
 public interface IUserCredentialRepository
 {
-    Task<Either<UserCredentialAddError, Unit>> Add(UserCredential userCredential, CancellationToken cancellationToken);
+    EitherAsync<UserCredentialAddError, Unit> Add(UserCredential userCredential, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<UserCredential>> GetAll(CancellationToken cancellationToken);
 }
 
-[Union]
-public partial record UserCredentialAddError
+[GenerateOneOf]
+public partial class UserCredentialAddError : OneOfBase<UserCredentialAddError.NameAlreadyExists>
 {
-    partial record NameAlreadyExists(string Name);
+    public sealed record NameAlreadyExists(string Name);
 }

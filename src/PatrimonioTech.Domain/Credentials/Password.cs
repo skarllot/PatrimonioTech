@@ -1,4 +1,4 @@
-﻿using Dunet;
+﻿using OneOf;
 using PatrimonioTech.Domain.Common;
 
 namespace PatrimonioTech.Domain.Credentials;
@@ -22,10 +22,10 @@ public sealed record Password
     }
 }
 
-[Union]
-public partial record PasswordError
+[GenerateOneOf]
+public partial class PasswordError : OneOfBase<PasswordError.Empty, PasswordError.TooShort>
 {
-    partial record Empty;
+    public sealed record Empty;
 
-    partial record TooShort(string Password);
+    public sealed record TooShort(string Password);
 }

@@ -1,4 +1,4 @@
-﻿using Dunet;
+﻿using OneOf;
 
 namespace PatrimonioTech.Domain.Credentials.Services;
 
@@ -10,10 +10,10 @@ public interface IKeyDerivation
 
 public sealed record CreateKeyResult(string Salt, string EncryptedKey);
 
-[Union]
-public partial record GetKeyError
+[GenerateOneOf]
+public partial class GetKeyError : OneOfBase<GetKeyError.InvalidSalt, GetKeyError.InvalidEncryptedKey>
 {
-    partial record InvalidSalt(string Salt);
+    public sealed record InvalidSalt(string Salt);
 
-    partial record InvalidEncryptedKey(string EncryptedKey);
+    public sealed record InvalidEncryptedKey(string EncryptedKey);
 }

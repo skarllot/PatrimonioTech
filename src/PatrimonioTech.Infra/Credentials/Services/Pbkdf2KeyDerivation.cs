@@ -44,13 +44,13 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
         Span<byte> binarySalt = stackalloc byte[keySize / BitsPerByte];
         if (!Convert.TryFromBase64Chars(salt, binarySalt, out int saltBytes) || saltBytes != binarySalt.Length)
         {
-            return new GetKeyError.InvalidSalt(salt);
+            return (GetKeyError)new GetKeyError.InvalidSalt(salt);
         }
 
         Span<byte> binaryEncrypted = stackalloc byte[keySize];
         if (!Convert.TryFromBase64Chars(encryptedKey, binaryEncrypted, out int encryptedBytes))
         {
-            return new GetKeyError.InvalidEncryptedKey(encryptedKey);
+            return (GetKeyError)new GetKeyError.InvalidEncryptedKey(encryptedKey);
         }
 
         byte[] binaryHash = new byte[AesMaxKeySize / BitsPerByte];

@@ -28,14 +28,20 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
         _configFile = Path.Combine(_appData, options.Value.FileName);
     }
 
-    public async Task<Either<UserCredentialAddError, Unit>> Add(UserCredential userCredential, CancellationToken cancellationToken)
+    EitherAsync<UserCredentialAddError, Unit> IUserCredentialRepository.Add(
+        UserCredential userCredential,
+        CancellationToken cancellationToken) => Add(userCredential, cancellationToken).ToAsync();
+
+    private async Task<Either<UserCredentialAddError, Unit>> Add(
+        UserCredential userCredential,
+        CancellationToken cancellationToken)
     {
         var current = await Read(cancellationToken).ConfigureAwait(false);
 
         if (current.Exists(u => u.Name.Equals(userCredential.Name, StringComparison.OrdinalIgnoreCase)))
         {
             LogUserAlreadyExists(userCredential.Name);
-            return new UserCredentialAddError.NameAlreadyExists(userCredential.Name);
+            return (UserCredentialAddError)new UserCredentialAddError.NameAlreadyExists(userCredential.Name);
         }
 
         current.Add(userCredential);

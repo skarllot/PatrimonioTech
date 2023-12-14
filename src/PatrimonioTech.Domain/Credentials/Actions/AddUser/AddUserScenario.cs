@@ -1,4 +1,4 @@
-﻿using Dunet;
+﻿using OneOf;
 using PatrimonioTech.Domain.Common;
 using PatrimonioTech.Domain.Credentials.Services;
 
@@ -20,7 +20,7 @@ public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
                     n => n.HaveLength(l => l >= NameMinLength))
                 .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.NameTooShort(command.Name))
             from password in Password.Create(command.Password)
-                .MapLeft<AddUserCredentialError>(e => new AddUserCredentialError.Password(e))
+                .MapLeft<AddUserCredentialError>(e => e)
             from keySize in command.KeySize.Pipe(
                 k => k.GreaterOrEqualsThan(KeySizeMinimum)
                     .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.KeySizeTooLow(k)),
@@ -37,18 +37,22 @@ public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
     }
 }
 
-[Union]
-public partial record AddUserCredentialError
+[GenerateOneOf]
+public partial class AddUserCredentialError : OneOfBase<
+    PasswordError,
+    AddUserCredentialError.NameTooShort,
+    AddUserCredentialError.KeySizeTooLow,
+    AddUserCredentialError.KeySizeTooHigh,
+    AddUserCredentialError.IterationsTooLow,
+    AddUserCredentialError.IterationsTooHigh>
 {
-    partial record Password(PasswordError Error);
+    public sealed record NameTooShort(string Name);
 
-    partial record NameTooShort(string Name);
+    public sealed record KeySizeTooLow(int KeySize);
 
-    partial record KeySizeTooLow(int KeySize);
+    public sealed record KeySizeTooHigh(int KeySize);
 
-    partial record KeySizeTooHigh(int KeySize);
+    public sealed record IterationsTooLow(int Iterations);
 
-    partial record IterationsTooLow(int Iterations);
-
-    partial record IterationsTooHigh(int Iterations);
+    public sealed record IterationsTooHigh(int Iterations);
 }
