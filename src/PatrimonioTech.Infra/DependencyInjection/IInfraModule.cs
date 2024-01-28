@@ -1,6 +1,7 @@
 ﻿using Jab;
 using PatrimonioTech.Domain.Credentials.Services;
 using PatrimonioTech.Infra.Credentials.Services;
+using Raiqub.JabModules.MicrosoftExtensionsOptions;
 
 namespace PatrimonioTech.Infra.DependencyInjection;
 
