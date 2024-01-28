@@ -1,9 +1,10 @@
-﻿using OneOf;
-using PatrimonioTech.Domain.Common;
+﻿using Generator.Equals;
+using PatrimonioTech.Domain.Common.Parsers;
 
 namespace PatrimonioTech.Domain.Credentials;
 
-public sealed record Password
+[Equatable]
+public sealed partial class Password
 {
     public const int PasswordMinLength = 8;
 
@@ -11,21 +12,16 @@ public sealed record Password
 
     public string Value { get; }
 
-    public static Either<PasswordError, Password> Create(string value)
+    public static Result<Password, PasswordError> Create(string value)
     {
-        return from v in value.Pipe(
-                v => v.IsNotNullOrWhitespace()
-                    .ToEither<PasswordError>(() => new PasswordError.Empty()),
-                v => v.HaveLength(l => l >= PasswordMinLength)
-                    .ToEither<PasswordError>(() => new PasswordError.TooShort(v)))
-            select new Password(v);
+        return StringParser.NotNullOrWhitespace(value).ToResult(PasswordError.Empty)
+            .Ensure(v => v.Length >= PasswordMinLength, PasswordError.TooShort)
+            .Map(v => new Password(v));
     }
 }
 
-[GenerateOneOf]
-public partial class PasswordError : OneOfBase<PasswordError.Empty, PasswordError.TooShort>
+public enum PasswordError
 {
-    public sealed record Empty;
-
-    public sealed record TooShort(string Password);
+    Empty = 1,
+    TooShort
 }

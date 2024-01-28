@@ -2,9 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace PatrimonioTech.Domain.Common;
+namespace PatrimonioTech.Domain.Common.ValueObjects;
 
-public readonly partial struct Cnpj
+public partial class Cnpj
 {
     private static readonly FrozenSet<string> s_invalidSet = new[]
     {

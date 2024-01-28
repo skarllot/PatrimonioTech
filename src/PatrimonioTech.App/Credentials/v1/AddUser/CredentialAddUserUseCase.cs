@@ -1,6 +1,7 @@
-﻿using LanguageExt;
+﻿using CSharpFunctionalExtensions;
 using OneOf;
 using PatrimonioTech.Domain.Common;
+using PatrimonioTech.Domain.Common.ValueObjects;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
@@ -13,17 +14,17 @@ public class CredentialAddUserUseCase(
     IAddUserScenario addUserScenario)
     : ICredentialAddUserUseCase
 {
-    public EitherAsync<CredentialAddUserResult, Unit> Execute(
+    public Task<Result<Unit, CredentialAddUserResult>> Execute(
         CredentialAddUserRequest request,
         CancellationToken cancellationToken)
     {
         return from scnRes in addUserScenario
                 .Execute(new AddUserCredential(request.Name, request.Password, request.KeySize, request.Iterations))
-                .MapLeft<CredentialAddUserResult>(e => e)
+                .MapError(e => (CredentialAddUserResult)e)
             let model = UserCredential.Create(scnRes)
             from repoRes in userCredentialRepository.Add(model, cancellationToken)
-                .MapLeft<CredentialAddUserResult>(e => e)
-            select Unit.Default;
+                .MapError(e => (CredentialAddUserResult)e)
+            select Unit.Value;
     }
 }
 

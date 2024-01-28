@@ -1,4 +1,5 @@
-﻿using PatrimonioTech.Domain.Credentials.Actions.AddUser;
+﻿using System.Text.Json.Serialization;
+using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 
 namespace PatrimonioTech.Domain.Credentials;
 
@@ -7,6 +8,7 @@ public sealed class UserCredential
     public const int DefaultKeySize = 512;
     public const int DefaultIterations = 100_000;
 
+    [JsonConstructor]
     private UserCredential(
         string name,
         string salt,

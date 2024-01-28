@@ -1,8 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using PatrimonioTech.Domain.Common.ValueObjects;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 
@@ -28,11 +29,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
         _configFile = Path.Combine(_appData, options.Value.FileName);
     }
 
-    EitherAsync<UserCredentialAddError, Unit> IUserCredentialRepository.Add(
-        UserCredential userCredential,
-        CancellationToken cancellationToken) => Add(userCredential, cancellationToken).ToAsync();
-
-    private async Task<Either<UserCredentialAddError, Unit>> Add(
+    public async Task<Result<Unit, UserCredentialAddError>> Add(
         UserCredential userCredential,
         CancellationToken cancellationToken)
     {
@@ -41,7 +38,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
         if (current.Exists(u => u.Name.Equals(userCredential.Name, StringComparison.OrdinalIgnoreCase)))
         {
             LogUserAlreadyExists(userCredential.Name);
-            return (UserCredentialAddError)new UserCredentialAddError.NameAlreadyExists(userCredential.Name);
+            return UserCredentialAddError.NameAlreadyExists;
         }
 
         current.Add(userCredential);
@@ -56,7 +53,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
             .ConfigureAwait(false);
 
         LogNewUserAdded(userCredential.Name);
-        return Unit.Default;
+        return Unit.Value;
     }
 
     public async Task<IReadOnlyList<UserCredential>> GetAll(CancellationToken cancellationToken)

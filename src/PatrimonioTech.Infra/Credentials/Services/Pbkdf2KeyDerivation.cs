@@ -1,5 +1,5 @@
 ﻿using System.Security.Cryptography;
-using LanguageExt;
+using CSharpFunctionalExtensions;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 
@@ -34,7 +34,7 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
             EncryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]));
     }
 
-    public Either<GetKeyError, string> TryGetKey(
+    public Result<string, GetKeyError> TryGetKey(
         string password,
         string salt,
         string encryptedKey,
@@ -44,13 +44,13 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
         Span<byte> binarySalt = stackalloc byte[keySize / BitsPerByte];
         if (!Convert.TryFromBase64Chars(salt, binarySalt, out int saltBytes) || saltBytes != binarySalt.Length)
         {
-            return (GetKeyError)new GetKeyError.InvalidSalt(salt);
+            return GetKeyError.InvalidSalt;
         }
 
         Span<byte> binaryEncrypted = stackalloc byte[keySize];
         if (!Convert.TryFromBase64Chars(encryptedKey, binaryEncrypted, out int encryptedBytes))
         {
-            return (GetKeyError)new GetKeyError.InvalidEncryptedKey(encryptedKey);
+            return GetKeyError.InvalidEncryptedKey;
         }
 
         byte[] binaryHash = new byte[AesMaxKeySize / BitsPerByte];

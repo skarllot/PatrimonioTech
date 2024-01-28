@@ -1,16 +1,15 @@
-﻿using OneOf;
+﻿using PatrimonioTech.Domain.Common.ValueObjects;
 
 namespace PatrimonioTech.Domain.Credentials.Services;
 
 public interface IUserCredentialRepository
 {
-    EitherAsync<UserCredentialAddError, Unit> Add(UserCredential userCredential, CancellationToken cancellationToken);
+    Task<Result<Unit, UserCredentialAddError>> Add(UserCredential userCredential, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<UserCredential>> GetAll(CancellationToken cancellationToken);
 }
 
-[GenerateOneOf]
-public partial class UserCredentialAddError : OneOfBase<UserCredentialAddError.NameAlreadyExists>
+public enum UserCredentialAddError
 {
-    public sealed record NameAlreadyExists(string Name);
+    NameAlreadyExists = 1
 }

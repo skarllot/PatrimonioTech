@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using PatrimonioTech.App.DependencyInjection;
 using PatrimonioTech.Domain.DependencyInjection;
 using PatrimonioTech.Gui.DependencyInjection;
-using PatrimonioTech.Gui.Login;
 using PatrimonioTech.Infra.DependencyInjection;
 
 namespace PatrimonioTech.Gui.Desktop.DependencyInjection;

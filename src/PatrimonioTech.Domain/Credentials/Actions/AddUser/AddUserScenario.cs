@@ -1,5 +1,6 @@
 ﻿using OneOf;
 using PatrimonioTech.Domain.Common;
+using PatrimonioTech.Domain.Common.Parsers;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Domain.Credentials.Actions.AddUser;
@@ -13,24 +14,22 @@ public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
     private const int IterationsMinimum = 1000;
     private const int IterationsMaximum = 100_000_000;
 
-    public Either<AddUserCredentialError, UserCredentialAdded> Execute(AddUserCredential command)
+    public Result<UserCredentialAdded, AddUserCredentialError> Execute(AddUserCredential command)
     {
-        return from name in command.Name.Pipe(
-                    n => n.IsNotNullOrWhitespace(),
-                    n => n.HaveLength(l => l >= NameMinLength))
-                .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.NameTooShort(command.Name))
+        return from name in StringParser.NotNullOrWhitespace(command.Name)
+                .Where(v => v.Length >= NameMinLength)
+                .ToResult(() => AddUserCredentialError.Other.NameTooShort)
+                .MapError(e => (AddUserCredentialError)e)
             from password in Password.Create(command.Password)
-                .MapLeft<AddUserCredentialError>(e => e)
-            from keySize in command.KeySize.Pipe(
-                k => k.GreaterOrEqualsThan(KeySizeMinimum)
-                    .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.KeySizeTooLow(k)),
-                k => k.LessOrEqualsThan(KeySizeMaximum)
-                    .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.KeySizeTooHigh(k)))
-            from iterations in command.Iterations.Pipe(
-                i => i.GreaterOrEqualsThan(IterationsMinimum)
-                    .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.IterationsTooLow(i)),
-                i => i.LessOrEqualsThan(IterationsMaximum)
-                    .ToEither<AddUserCredentialError>(() => new AddUserCredentialError.IterationsTooHigh(i)))
+                .MapError(e => (AddUserCredentialError)e)
+            from keySize in command.KeySize
+                .Ensure(v => v >= KeySizeMinimum, AddUserCredentialError.Other.KeySizeTooLow)
+                .Ensure(v => v <= KeySizeMaximum, AddUserCredentialError.Other.KeySizeTooHigh)
+                .MapError(e => (AddUserCredentialError)e)
+            from iterations in command.Iterations
+                .Ensure(v => v >= IterationsMinimum, AddUserCredentialError.Other.IterationsTooLow)
+                .Ensure(v => v <= IterationsMaximum, AddUserCredentialError.Other.IterationsTooHigh)
+                .MapError(e => (AddUserCredentialError)e)
             let key = keyDerivation.CreateKey(password, keySize, iterations)
             let dbId = Guid.NewGuid()
             select new UserCredentialAdded(name, key.Salt, key.EncryptedKey, dbId, keySize, iterations);
@@ -40,19 +39,14 @@ public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
 [GenerateOneOf]
 public partial class AddUserCredentialError : OneOfBase<
     PasswordError,
-    AddUserCredentialError.NameTooShort,
-    AddUserCredentialError.KeySizeTooLow,
-    AddUserCredentialError.KeySizeTooHigh,
-    AddUserCredentialError.IterationsTooLow,
-    AddUserCredentialError.IterationsTooHigh>
+    AddUserCredentialError.Other>
 {
-    public sealed record NameTooShort(string Name);
-
-    public sealed record KeySizeTooLow(int KeySize);
-
-    public sealed record KeySizeTooHigh(int KeySize);
-
-    public sealed record IterationsTooLow(int Iterations);
-
-    public sealed record IterationsTooHigh(int Iterations);
+    public enum Other
+    {
+        NameTooShort = 1,
+        KeySizeTooLow,
+        KeySizeTooHigh,
+        IterationsTooLow,
+        IterationsTooHigh
+    }
 }

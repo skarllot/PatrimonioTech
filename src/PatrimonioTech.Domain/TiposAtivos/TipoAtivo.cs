@@ -1,4 +1,5 @@
 ﻿using PatrimonioTech.Domain.Common;
+using PatrimonioTech.Domain.Common.ValueObjects;
 
 namespace PatrimonioTech.Domain.TiposAtivos;
 
@@ -8,10 +9,15 @@ public sealed class TipoAtivo(NotEmptyString nome)
 
     public static IEnumerable<TipoAtivo> Seed()
     {
-        yield return new TipoAtivo(NotEmptyString.From("Não Especificado"));
-        yield return new TipoAtivo(NotEmptyString.From("Ação"));
-        yield return new TipoAtivo(NotEmptyString.From("FII"));
-        yield return new TipoAtivo(NotEmptyString.From("FI-Infra"));
-        yield return new TipoAtivo(NotEmptyString.From("Fundo"));
+        return new[]
+            {
+                NotEmptyString.Create("Não Especificado"),
+                NotEmptyString.Create("Ação"),
+                NotEmptyString.Create("FII"),
+                NotEmptyString.Create("FI-Infra"),
+                NotEmptyString.Create("Fundo")
+            }
+            .Select(r => r.TryGetValue())
+            .Choose(v => new TipoAtivo(v));
     }
 }
