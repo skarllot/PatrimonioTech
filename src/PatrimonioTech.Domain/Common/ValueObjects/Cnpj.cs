@@ -15,9 +15,9 @@ public sealed partial class Cnpj
     public static Result<Cnpj, CnpjError> Create(string value)
     {
         return StringParser.NotNullOrWhitespace(value).ToResult(CnpjError.Empty)
-            .Ensure(v => v.Length == Length, v => v.Length > Length ? CnpjError.TooLong : CnpjError.TooShort)
+            .Ensure(v => v.Length >= Length, CnpjError.TooShort)
+            .Bind(v => Parser.TryNormalize(v))
             .Ensure(Parser.IsValid, CnpjError.Invalid)
-            .Apply(v => Parser.TryNormalize(v, out string? result) ? result : Maybe.None, CnpjError.Invalid)
             .Map(v => new Cnpj(v));
     }
 }

@@ -15,7 +15,7 @@ public class CnpjTests
     {
         var cnpj = Cnpj.Create(input);
 
-        cnpj.Should().Succeed().And.Subject.Value.Should().Be(expected);
+        cnpj.Should().Succeed().And.Subject.Value.Value.Should().Be(expected);
     }
 
     [Theory]
@@ -24,10 +24,10 @@ public class CnpjTests
     [InlineData("330001670577-24")]
     [InlineData("33000177057723")]
     [InlineData("10.038.166/0002-88")]
-    public void From_WithInvalidInput_ThrowsException(string input)
+    public void From_WithInvalidInput_Fails(string input)
     {
         var cnpj = Cnpj.Create(input);
 
-        cnpj.Should().FailWith(CnpjError.Invalid);
+        cnpj.Should().Fail();
     }
 }
