@@ -1,6 +1,7 @@
 ﻿using Jab;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Raiqub.JabModules.MicrosoftExtensionsOptions;
 
 namespace PatrimonioTech.Infra.DependencyInjection;
 
@@ -12,5 +13,5 @@ public interface ILoggingModule
 {
     public static IConfigureOptions<LoggerFilterOptions>
         ConfigureFilterOptions(Action<LoggerFilterOptions>? configure) =>
-        IOptionsModule.Configure(configure);
+        IOptionsModule.Configure(configure ?? (_ => { }));
 }

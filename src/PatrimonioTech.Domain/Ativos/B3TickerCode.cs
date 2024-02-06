@@ -10,7 +10,8 @@ public enum B3TickerCode
     [Description("Direito de subscrição a uma ação preferencial")]
     DireitoSubcricaoAcaoPreferencial = 2,
 
-    [Description("Ação ordinária (ON)")] AcaoOrdinaria = 3,
+    [Description("Ação ordinária (ON)")]
+    AcaoOrdinaria = 3,
 
     [Description("Ação preferencial (PN)")]
     AcaoPreferencial = 4,
@@ -42,7 +43,12 @@ public enum B3TickerCode
     [Description("BDR Patrocinado Nível III")]
     BdrPatrocinadoN3 = 33,
 
-    [Description("BDR Não Patrocinado")] BdrNaoPatrocinadoA = 34,
-    [Description("BDR Não Patrocinado")] BdrNaoPatrocinadoB = 35,
-    [Description("BDR de ETF")] BdrEtf = 39
+    [Description("BDR Não Patrocinado")]
+    BdrNaoPatrocinadoA = 34,
+
+    [Description("BDR Não Patrocinado")]
+    BdrNaoPatrocinadoB = 35,
+
+    [Description("BDR de ETF")]
+    BdrEtf = 39
 }

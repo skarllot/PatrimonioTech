@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Vogen;
 
 namespace PatrimonioTech.Domain.Ativos;
 
@@ -24,10 +23,14 @@ public sealed record B3Ticker(B3TickerName Name, B3TickerCode Code)
                 return null;
 
             if (value.Length is < 5 or > 6)
-                throw new ValueObjectValidationException("Invalid B3 ticker");
+                throw new JsonException("Invalid B3 ticker");
+
+            var tickerName = B3TickerName.Create(value[..4]);
+            if (tickerName.IsFailure)
+                throw new JsonException("Invalid B3 ticker name");
 
             int code = int.Parse(value.AsSpan(4), CultureInfo.InvariantCulture);
-            return new B3Ticker(B3TickerName.From(value[..4]), (B3TickerCode)code);
+            return new B3Ticker(tickerName.Value, (B3TickerCode)code);
         }
     }
 }

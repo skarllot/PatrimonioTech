@@ -2,9 +2,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-namespace PatrimonioTech.Domain.Common;
+namespace PatrimonioTech.Domain.Common.ValueObjects;
 
-public readonly partial struct Cnpj
+public partial class Cnpj
 {
     private static readonly FrozenSet<string> s_invalidSet = new[]
     {
@@ -42,38 +42,36 @@ public readonly partial struct Cnpj
             return v1Char == value[12] && v2Char == value[13];
         }
 
-        public static bool TryNormalize(ReadOnlySpan<char> input, [NotNullWhen(true)] out string? result)
+        public static Result<string, CnpjError> TryNormalize(ReadOnlySpan<char> input)
         {
-            result = null;
             Span<char> buffer =
                 stackalloc char[Length] { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
 
             input = input.Trim();
             if (input.Length == 0)
-                return false;
+                return CnpjError.Empty;
 
             int position = buffer.Length - 1;
             for (int i = input.Length - 1; i >= 0; i--)
             {
                 char c = input[i];
-                if (SkipSpecialCharacter(c))
+                if (IsSpecialCharacter(c))
                     continue;
 
                 if (position < 0)
-                    return false;
+                    return CnpjError.TooLong;
 
                 if (!char.IsDigit(c))
-                    return false;
+                    return CnpjError.Invalid;
 
                 buffer[position--] = c;
             }
 
-            result = buffer.ToString();
-            return true;
+            return buffer.ToString();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool SkipSpecialCharacter(char c)
+        private static bool IsSpecialCharacter(char c)
         {
             return c is '.' or '-' or ' ' or '/';
         }

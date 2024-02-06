@@ -1,10 +1,9 @@
-﻿using LanguageExt;
-using PatrimonioTech.Domain.Common;
+﻿using PatrimonioTech.Domain.Common.ValueObjects;
 
 namespace PatrimonioTech.Domain.Escrituradores;
 
-public sealed class Escriturador(NotEmptyString nome, Option<Cnpj> cnpj)
+public sealed class Escriturador(NotEmptyString nome, Maybe<Cnpj> cnpj)
 {
     public NotEmptyString Nome { get; } = nome;
-    public Option<Cnpj> Cnpj { get; } = cnpj;
+    public Maybe<Cnpj> Cnpj { get; } = cnpj;
 }

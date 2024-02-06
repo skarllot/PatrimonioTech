@@ -4,13 +4,7 @@ public static class TheoryDataEnumerableExtensions
 {
     public static TheoryData<T> ToTheoryData<T>(this IEnumerable<T> source)
     {
-        var theoryData = new TheoryData<T>();
-        foreach (T value in source)
-        {
-            theoryData.Add(value);
-        }
-
-        return theoryData;
+        return new TheoryData<T>(source);
     }
 
     public static TheoryData<T1, T2> ToTheoryData<T1, T2>(this IEnumerable<(T1, T2)> source)

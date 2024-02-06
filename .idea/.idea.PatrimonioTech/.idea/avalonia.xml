@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="src/PatrimonioTech.Gui/App.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/DefaultStyles.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/Login/LoginStyles.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/Login/LoginView.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/Login/LoginWindow.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/Main/MainWindow.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

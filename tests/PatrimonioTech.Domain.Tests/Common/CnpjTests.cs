@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
-using PatrimonioTech.Domain.Common;
-using Vogen;
+using PatrimonioTech.Domain.Common.ValueObjects;
 
 namespace PatrimonioTech.Domain.Tests.Common;
 
@@ -14,9 +13,9 @@ public class CnpjTests
     [InlineData("00.038.166/0002-88", "00038166000288")]
     public void From_WithValidInput_ReturnsInstance(string input, string expected)
     {
-        Cnpj cnpj = Cnpj.From(input);
+        var cnpj = Cnpj.Create(input);
 
-        cnpj.Value.Should().Be(expected);
+        cnpj.Should().Succeed().And.Subject.Value.Value.Should().Be(expected);
     }
 
     [Theory]
@@ -25,10 +24,10 @@ public class CnpjTests
     [InlineData("330001670577-24")]
     [InlineData("33000177057723")]
     [InlineData("10.038.166/0002-88")]
-    public void From_WithInvalidInput_ThrowsException(string input)
+    public void From_WithInvalidInput_Fails(string input)
     {
-        Action from = () => Cnpj.From(input);
+        var cnpj = Cnpj.Create(input);
 
-        from.Should().ThrowExactly<ValueObjectValidationException>();
+        cnpj.Should().Fail();
     }
 }

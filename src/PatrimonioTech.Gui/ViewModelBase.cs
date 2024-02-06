@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using ReactiveUI;
 
-namespace PatrimonioTech.Gui.ViewModels;
+namespace PatrimonioTech.Gui;
 
 public class ViewModelBase : ReactiveObject, IActivatableViewModel
 {

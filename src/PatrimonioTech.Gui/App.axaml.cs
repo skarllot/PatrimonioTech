@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using PatrimonioTech.Gui.ViewModels;
-using PatrimonioTech.Gui.Views;
+using PatrimonioTech.Gui.DependencyInjection;
+using PatrimonioTech.Gui.Main;
 
 namespace PatrimonioTech.Gui;
 
-public partial class App : Application
+public partial class App(IFactory<MainWindow> mainWindow) : Application
 {
     public override void Initialize()
     {
@@ -17,10 +17,7 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = new MainWindowViewModel(),
-            };
+            desktop.MainWindow = mainWindow.Create();
         }
 
         base.OnFrameworkInitializationCompleted();

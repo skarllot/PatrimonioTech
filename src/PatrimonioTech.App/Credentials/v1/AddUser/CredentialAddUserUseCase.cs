@@ -1,32 +1,34 @@
-﻿using LanguageExt;
-using LanguageExt.Common;
+﻿using CSharpFunctionalExtensions;
+using OneOf;
 using PatrimonioTech.Domain.Common;
+using PatrimonioTech.Domain.Common.ValueObjects;
 using PatrimonioTech.Domain.Credentials;
+using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.App.Credentials.v1.AddUser;
 
 [GenerateAutomaticInterface]
 public class CredentialAddUserUseCase(
-        IUserCredentialRepository userCredentialRepository,
-        IKeyDerivation keyDerivation)
+    IUserCredentialRepository userCredentialRepository,
+    IAddUserScenario addUserScenario)
     : ICredentialAddUserUseCase
 {
-    public async Task<Result<Unit>> Execute(CredentialAddUserRequest request, CancellationToken cancellationToken)
+    public Task<Result<Unit, CredentialAddUserResult>> Execute(
+        CredentialAddUserRequest request,
+        CancellationToken cancellationToken)
     {
-        (string? salt, string? encryptedKey) = keyDerivation
-            .CreateKey(request.Password, request.KeySize, request.Iterations);
-
-        var newUser = new UserCredential(
-            request.Name,
-            salt,
-            encryptedKey,
-            Guid.NewGuid(),
-            request.KeySize,
-            request.Iterations);
-
-        return await userCredentialRepository
-            .Add(newUser, cancellationToken)
-            .ConfigureAwait(false);
+        return from scnRes in addUserScenario
+                .Execute(new AddUserCredential(request.Name, request.Password, request.KeySize, request.Iterations))
+                .MapError(e => (CredentialAddUserResult)e)
+            let model = UserCredential.Create(scnRes)
+            from repoRes in userCredentialRepository.Add(model, cancellationToken)
+                .MapError(e => (CredentialAddUserResult)e)
+            select Unit.Value;
     }
 }
+
+[GenerateOneOf]
+public partial class CredentialAddUserResult : OneOfBase<
+    AddUserCredentialError,
+    UserCredentialAddError>;

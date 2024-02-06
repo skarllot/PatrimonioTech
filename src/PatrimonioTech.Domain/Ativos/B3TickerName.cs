@@ -1,32 +1,29 @@
 ﻿using System.Text.RegularExpressions;
-using Vogen;
+using Generator.Equals;
+using PatrimonioTech.Domain.Common.Parsers;
 
 namespace PatrimonioTech.Domain.Ativos;
 
-[ValueObject<string>(comparison: ComparisonGeneration.Omit)]
-public readonly partial struct B3TickerName
+[Equatable]
+public sealed partial class B3TickerName
 {
+    private B3TickerName(string value) => Value = value;
+
+    public string Value { get; }
+
     [GeneratedRegex("^[A-Z0-9]{4}$")]
     private static partial Regex GetValidationPattern();
 
-    private static string? NormalizeInput(string? value)
+    public static Result<B3TickerName, B3TickerNameError> Create(string value)
     {
-        var inputTrimmed = value.AsSpan().Trim();
-        if (inputTrimmed.Length != 4)
-            return value;
-
-        Span<char> result = stackalloc char[4];
-        inputTrimmed.ToUpperInvariant(result);
-        return result.ToString();
+        return StringParser.NotNullOrWhitespace(value).ToResult(B3TickerNameError.Empty)
+            .Ensure(v => GetValidationPattern().IsMatch(value), B3TickerNameError.Invalid)
+            .Map(v => new B3TickerName(v));
     }
+}
 
-    private static Validation Validate(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            return Validation.Invalid("Length must be greater than zero");
-        if (!GetValidationPattern().IsMatch(input))
-            return Validation.Invalid("Invalid value");
-
-        return Validation.Ok;
-    }
+public enum B3TickerNameError
+{
+    Empty = 1,
+    Invalid
 }
