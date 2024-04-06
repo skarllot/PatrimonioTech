@@ -41,16 +41,9 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
             return UserCredentialAddError.NameAlreadyExists;
         }
 
-        current.Add(userCredential);
+        current.Add(userCredential.ToModel());
 
-        await using var fileStream = new FileStream(_configFile, FileMode.Create, FileAccess.Write);
-        await JsonSerializer
-            .SerializeAsync(fileStream, current, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        await fileStream
-            .FlushAsync(cancellationToken)
-            .ConfigureAwait(false);
+        await Write(current, cancellationToken);
 
         LogNewUserAdded(userCredential.Name);
         return Unit.Value;
@@ -58,10 +51,13 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
 
     public async Task<IReadOnlyList<UserCredential>> GetAll(CancellationToken cancellationToken)
     {
-        return await Read(cancellationToken).ConfigureAwait(false);
+        var credentials = from m in await Read(cancellationToken).ConfigureAwait(false)
+            select m.ToEntity();
+
+        return credentials.ToList();
     }
 
-    private async Task<List<UserCredential>> Read(CancellationToken cancellationToken)
+    private async Task<List<UserCredentialModel>> Read(CancellationToken cancellationToken)
     {
         if (!Directory.Exists(_appData))
         {
@@ -74,7 +70,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
             await File
                 .WriteAllTextAsync(_configFile, "[]", Encoding.UTF8, cancellationToken)
                 .ConfigureAwait(false);
-            return new List<UserCredential>();
+            return new List<UserCredentialModel>();
         }
 
         try
@@ -82,13 +78,13 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
             await using var fileStream = new FileStream(_configFile, FileMode.OpenOrCreate, FileAccess.Read);
             if (fileStream.Length == 0)
             {
-                return new List<UserCredential>();
+                return new List<UserCredentialModel>();
             }
 
             var result = await JsonSerializer
-                .DeserializeAsync<List<UserCredential>>(fileStream, cancellationToken: cancellationToken)
+                .DeserializeAsync<List<UserCredentialModel>>(fileStream, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
-            return result ?? new List<UserCredential>();
+            return result ?? [];
         }
         catch (JsonException e)
         {
@@ -100,8 +96,20 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
                 .ConfigureAwait(false);
             LogConfigFileCreated();
 
-            return new List<UserCredential>();
+            return [];
         }
+    }
+
+    private async Task Write(List<UserCredentialModel> data, CancellationToken cancellationToken)
+    {
+        await using var fileStream = new FileStream(_configFile, FileMode.Create, FileAccess.Write);
+        await JsonSerializer
+            .SerializeAsync(fileStream, data, cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+
+        await fileStream
+            .FlushAsync(cancellationToken)
+            .ConfigureAwait(false);
     }
 
     [LoggerMessage(LogLevel.Information, "The application data directory was created")]
