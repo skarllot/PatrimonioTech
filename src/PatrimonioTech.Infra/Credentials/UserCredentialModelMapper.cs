@@ -1,24 +1,15 @@
 ﻿using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
+using Riok.Mapperly.Abstractions;
 
 namespace PatrimonioTech.Infra.Credentials;
 
-public static class UserCredentialModelMapper
+[Mapper]
+public static partial class UserCredentialModelMapper
 {
-    public static UserCredentialModel ToModel(this UserCredential userCredential) => new UserCredentialModel(
-        userCredential.Name,
-        userCredential.Salt,
-        userCredential.Key,
-        userCredential.Database,
-        userCredential.KeySize,
-        userCredential.Iterations);
+    public static partial UserCredentialModel ToModel(this UserCredential userCredential);
 
-    public static UserCredential ToEntity(this UserCredentialModel model) => UserCredential.Create(
-        new UserCredentialAdded(
-            model.Name,
-            model.Salt,
-            model.Key,
-            model.Database,
-            model.KeySize,
-            model.Iterations));
+    public static UserCredential ToEntity(this UserCredentialModel model) => UserCredential.Create(ToEvent(model));
+
+    private static partial UserCredentialAdded ToEvent(UserCredentialModel model);
 }
