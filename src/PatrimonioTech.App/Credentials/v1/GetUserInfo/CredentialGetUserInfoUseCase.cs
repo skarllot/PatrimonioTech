@@ -23,9 +23,17 @@ public class CredentialGetUserInfoUseCase(
                 .ToResult(CredentialGetUserInfoError.Other.UserNotFound)
                 .MapError(e => (CredentialGetUserInfoError)e)
             from password in keyDerivation
-                .TryGetKey(request.Password, foundUser.Salt, foundUser.Key, foundUser.KeySize, foundUser.Iterations)
+                .TryGetKey(
+                    password: request.Password,
+                    salt: foundUser.Salt,
+                    encryptedKey: foundUser.Key,
+                    keySize: foundUser.KeySize,
+                    iterations: foundUser.Iterations)
                 .MapError(e => (CredentialGetUserInfoError)e)
-            select new CredentialGetUserInfoResponse(foundUser.Name, foundUser.Database, password);
+            select new CredentialGetUserInfoResponse(
+                Name: foundUser.Name,
+                Database: foundUser.Database,
+                DatabasePassword: password);
     }
 }
 

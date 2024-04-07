@@ -1,16 +1,24 @@
 ﻿using System.Security.Cryptography;
 using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Infra.Credentials.Services;
 
-public class Pbkdf2KeyDerivation : IKeyDerivation
+public partial class Pbkdf2KeyDerivation : IKeyDerivation
 {
     private const int BitsPerByte = 8;
     private const int AesMaxKeySize = 256;
     private const int AesMaxIvSize = 128;
     private static readonly HashAlgorithmName s_hashAlgorithmName = HashAlgorithmName.SHA512;
+
+    private readonly ILogger<Pbkdf2KeyDerivation> _logger;
+
+    public Pbkdf2KeyDerivation(ILogger<Pbkdf2KeyDerivation> logger)
+    {
+        _logger = logger;
+    }
 
     public CreateKeyResult CreateKey(Password password, int keySize, int iterations)
     {
@@ -58,13 +66,29 @@ public class Pbkdf2KeyDerivation : IKeyDerivation
 
         Span<byte> binaryKey = stackalloc byte[keySize / BitsPerByte];
 
-        using Aes aes = Aes.Create();
-        aes.Key = binaryHash;
-        int keyBytes = aes.DecryptCbc(
-            binaryEncrypted[..encryptedBytes],
-            binarySalt[..(AesMaxIvSize / BitsPerByte)],
-            binaryKey);
+        Aes? aes = null;
+        try
+        {
+            aes = Aes.Create();
+            aes.Key = binaryHash;
+            int keyBytes = aes.DecryptCbc(
+                binaryEncrypted[..encryptedBytes],
+                binarySalt[..(AesMaxIvSize / BitsPerByte)],
+                binaryKey);
 
-        return Convert.ToBase64String(binaryKey[..keyBytes]);
+            return Convert.ToBase64String(binaryKey[..keyBytes]);
+        }
+        catch (CryptographicException e)
+        {
+            LogCryptographicException(e);
+            return GetKeyError.InvalidPassword;
+        }
+        finally
+        {
+            aes?.Dispose();
+        }
     }
+
+    [LoggerMessage(LogLevel.Error, "Error decrypting CBC")]
+    private partial void LogCryptographicException(CryptographicException exception);
 }

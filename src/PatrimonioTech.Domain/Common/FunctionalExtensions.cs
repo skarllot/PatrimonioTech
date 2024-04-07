@@ -31,4 +31,8 @@ public static class FunctionalExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Maybe<TValue> TryGetValue<TValue, TError>(this Result<TValue, TError> result) =>
         result.TryGetValue(out TValue? value) ? value : Maybe.None;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static object Case<TValue, TError>(this Result<TValue, TError> result) =>
+        result.TryGetValue(out var value, out var error) ? value : error;
 }
