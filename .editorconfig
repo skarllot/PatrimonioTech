@@ -154,6 +154,9 @@ csharp_space_between_square_brackets = false
 # CA1051: Do not declare visible instance fields
 dotnet_code_quality.ca1051.exclude_structs = true
 
+# CA1309: Use ordinal StringComparison
+dotnet_diagnostic.CA1309.severity = suggestion
+
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
 indent_size = 2
