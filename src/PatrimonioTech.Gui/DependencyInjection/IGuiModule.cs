@@ -2,6 +2,7 @@
 using PatrimonioTech.Gui.Dashboard;
 using PatrimonioTech.Gui.Login;
 using PatrimonioTech.Gui.Main;
+using PatrimonioTech.Gui.Users.Create;
 using ReactiveUI;
 
 namespace PatrimonioTech.Gui.DependencyInjection;
@@ -16,6 +17,7 @@ namespace PatrimonioTech.Gui.DependencyInjection;
 [Singleton<MainWindowViewModel>]
 [Transient<IScreen>(Factory = nameof(GetScreen))]
 [Transient<LoginViewModel>]
+[Transient<UserCreateViewModel>]
 [Transient<DashboardViewModel>]
 public interface IGuiModule
 {

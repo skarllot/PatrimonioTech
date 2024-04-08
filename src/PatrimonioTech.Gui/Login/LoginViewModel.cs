@@ -10,6 +10,7 @@ using PatrimonioTech.Domain.Credentials.Services;
 using PatrimonioTech.Gui.Common;
 using PatrimonioTech.Gui.Dashboard;
 using PatrimonioTech.Gui.DependencyInjection;
+using PatrimonioTech.Gui.Users.Create;
 using PropertyChanged.SourceGenerator;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
@@ -23,6 +24,7 @@ public partial class LoginViewModel : RoutableViewModelBase
     [Notify] private string _senha = string.Empty;
 
     public ReactiveCommand<Unit, (string Usuario, string Senha)> Enter { get; }
+    public ReactiveCommand<Unit, Unit> CreateNew { get; }
 
     // Presentation Streams
     public IObservable<ImmutableList<string>> UsuariosExistentes { get; }
@@ -31,6 +33,7 @@ public partial class LoginViewModel : RoutableViewModelBase
         IScreen hostScreen,
         ICredentialGetUsersUseCase credentialGetUsersUseCase,
         ICredentialGetUserInfoUseCase credentialGetUserInfoUseCase,
+        IFactory<UserCreateViewModel> userCreate,
         IFactory<DashboardViewModel> dashboard)
         : base(hostScreen)
     {
@@ -68,6 +71,10 @@ public partial class LoginViewModel : RoutableViewModelBase
         Enter = ReactiveCommand.Create(
             () => (Usuario, Senha),
             canLogin);
+
+        // CREATE NEW COMMAND
+        CreateNew = ReactiveCommand.Create(
+            () => { hostScreen.Router.Navigate.Execute(userCreate.Create()); });
 
         // USER LIST OUTPUT
         UsuariosExistentes = allUserCredentials;

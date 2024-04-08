@@ -25,7 +25,7 @@
         <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" IsDefault="True" Command="{Binding Enter}">Entrar</Button>
         <StackPanel Classes="newuser" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
             <TextBlock>Não tem um perfil?</TextBlock>
-            <Button Classes="link">Crie um novo</Button>
+            <Button Classes="link" Command="{Binding CreateNew}">Crie um novo</Button>
         </StackPanel>
     </Grid>
 </UserControl>

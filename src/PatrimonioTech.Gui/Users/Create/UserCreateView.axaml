@@ -1,0 +1,26 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:create="clr-namespace:PatrimonioTech.Gui.Users.Create"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="350"
+             Width="500" Height="300"
+             x:Class="PatrimonioTech.Gui.Users.Create.UserCreateView"
+             x:DataType="create:UserCreateViewModel">
+    <UserControl.Styles>
+        <StyleInclude Source="/DefaultStyles.axaml" />
+        <StyleInclude Source="UserCreateStyles.axaml" />
+    </UserControl.Styles>
+    <Grid Name="Container" RowDefinitions="2*,10,1*,1*,1*,2*">
+        <TextBlock Classes="title" Grid.Row="0">Novo Usuário</TextBlock>
+
+        <TextBox Grid.Row="2" Watermark="Usuário" Text="{Binding UserName}" />
+        <TextBox Grid.Row="3" Watermark="Senha" PasswordChar="●" Text="{Binding Password}" />
+        <TextBox Grid.Row="4" Watermark="Confirmação de senha" PasswordChar="●" Text="{Binding PasswordConfirmation}" />
+
+        <Grid Classes="actions" Grid.Row="5" ColumnDefinitions="1*,1*">
+            <Button Grid.Column="0" IsDefault="False" Command="{Binding Cancel}">Cancelar</Button>
+            <Button Grid.Column="1" IsDefault="True" Command="{Binding Create}">Criar</Button>
+        </Grid>
+    </Grid>
+</UserControl>
