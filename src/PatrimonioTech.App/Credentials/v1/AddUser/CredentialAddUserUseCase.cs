@@ -10,8 +10,10 @@ namespace PatrimonioTech.App.Credentials.v1.AddUser;
 
 [GenerateAutomaticInterface]
 public class CredentialAddUserUseCase(
+    IDatabaseAdmin databaseAdmin,
     IUserCredentialRepository userCredentialRepository,
-    IAddUserScenario addUserScenario)
+    IAddUserScenario addUserScenario,
+    IKeyDerivation keyDerivation)
     : ICredentialAddUserUseCase
 {
     public Task<Result<Unit, CredentialAddUserResult>> Execute(
@@ -24,6 +26,11 @@ public class CredentialAddUserUseCase(
             let model = UserCredential.Create(scnRes)
             from repoRes in userCredentialRepository.Add(model, cancellationToken)
                 .MapError(e => (CredentialAddUserResult)e)
+            from key in keyDerivation
+                .TryGetKey(request.Password, model.Salt, model.Key, model.KeySize, model.Iterations)
+                .MapError(e => (CredentialAddUserResult)e)
+            from db in databaseAdmin.CreateDatabase(model.Database, key)
+                .MapError(e => (CredentialAddUserResult)e)
             select Unit.Default;
     }
 }
@@ -31,4 +38,6 @@ public class CredentialAddUserUseCase(
 [GenerateOneOf]
 public partial class CredentialAddUserResult : OneOfBase<
     AddUserCredentialError,
-    UserCredentialAddError>;
+    UserCredentialAddError,
+    GetKeyError,
+    CreateDatabaseError>;
