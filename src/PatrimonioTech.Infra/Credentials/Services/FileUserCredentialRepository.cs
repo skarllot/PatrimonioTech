@@ -1,9 +1,9 @@
-﻿using System.Text;
+﻿using System.Reactive;
+using System.Text;
 using System.Text.Json;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PatrimonioTech.Domain.Common.ValueObjects;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 
@@ -46,7 +46,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
         await Write(current, cancellationToken);
 
         LogNewUserAdded(userCredential.Name);
-        return Unit.Value;
+        return Unit.Default;
     }
 
     public async Task<IReadOnlyList<UserCredential>> GetAll(CancellationToken cancellationToken)

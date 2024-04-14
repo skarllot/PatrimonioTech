@@ -1,7 +1,7 @@
-﻿using CSharpFunctionalExtensions;
+﻿using System.Reactive;
+using CSharpFunctionalExtensions;
 using OneOf;
 using PatrimonioTech.Domain.Common;
-using PatrimonioTech.Domain.Common.ValueObjects;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
@@ -24,7 +24,7 @@ public class CredentialAddUserUseCase(
             let model = UserCredential.Create(scnRes)
             from repoRes in userCredentialRepository.Add(model, cancellationToken)
                 .MapError(e => (CredentialAddUserResult)e)
-            select Unit.Value;
+            select Unit.Default;
     }
 }
 

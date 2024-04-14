@@ -10,6 +10,8 @@
         <entry key="src/PatrimonioTech.Gui/Login/LoginView.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
         <entry key="src/PatrimonioTech.Gui/Login/LoginWindow.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
         <entry key="src/PatrimonioTech.Gui/Main/MainWindow.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/Users/Create/UserCreateStyles.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
+        <entry key="src/PatrimonioTech.Gui/Users/Create/UserCreateView.axaml" value="src/PatrimonioTech.Gui.Desktop/PatrimonioTech.Gui.Desktop.csproj" />
       </map>
     </option>
   </component>

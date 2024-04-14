@@ -13,7 +13,7 @@ public partial class UserCreateViewModel : RoutableViewModelBase
     [Notify] private string _passwordConfirmation = string.Empty;
 
     public ReactiveCommand<Unit, Unit> Cancel { get; }
-    public ReactiveCommand<Unit, Result<Domain.Common.ValueObjects.Unit, CredentialAddUserResult>> Create { get; }
+    public ReactiveCommand<Unit, Result<Unit, CredentialAddUserResult>> Create { get; }
 
     public UserCreateViewModel(IScreen hostScreen, ICredentialAddUserUseCase addUserUseCase) : base(hostScreen)
     {
