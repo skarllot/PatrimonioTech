@@ -1,9 +1,10 @@
-﻿using System.Text;
+﻿using System.Reactive;
+using System.Text;
 using System.Text.Json;
 using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using PatrimonioTech.Domain.Common.ValueObjects;
+using PatrimonioTech.App.SelfApplication;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 
@@ -14,19 +15,17 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
     private readonly ILogger<FileUserCredentialRepository> _logger;
     private readonly string _appData;
     private readonly string _configFile;
+    private readonly JsonSerializerOptions _jsonOptions;
 
     public FileUserCredentialRepository(
         IOptions<FileUserCredentialOptions> options,
-        ILogger<FileUserCredentialRepository> logger)
+        ILogger<FileUserCredentialRepository> logger,
+        ILocalPathProvider localPathProvider)
     {
         _logger = logger;
-        _appData = Path.Combine(
-            Environment.GetFolderPath(
-                Environment.SpecialFolder.ApplicationData,
-                Environment.SpecialFolderOption.Create),
-            options.Value.ApplicationName);
-
+        _appData = localPathProvider.AppData;
         _configFile = Path.Combine(_appData, options.Value.FileName);
+        _jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web) { WriteIndented = true };
     }
 
     public async Task<Result<Unit, UserCredentialAddError>> Add(
@@ -46,7 +45,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
         await Write(current, cancellationToken);
 
         LogNewUserAdded(userCredential.Name);
-        return Unit.Value;
+        return Unit.Default;
     }
 
     public async Task<IReadOnlyList<UserCredential>> GetAll(CancellationToken cancellationToken)
@@ -59,12 +58,6 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
 
     private async Task<List<UserCredentialModel>> Read(CancellationToken cancellationToken)
     {
-        if (!Directory.Exists(_appData))
-        {
-            Directory.CreateDirectory(_appData);
-            LogAppDataCreated();
-        }
-
         if (!File.Exists(_configFile))
         {
             await File
@@ -82,7 +75,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
             }
 
             var result = await JsonSerializer
-                .DeserializeAsync<List<UserCredentialModel>>(fileStream, cancellationToken: cancellationToken)
+                .DeserializeAsync<List<UserCredentialModel>>(fileStream, _jsonOptions, cancellationToken)
                 .ConfigureAwait(false);
             return result ?? [];
         }
@@ -104,16 +97,13 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
     {
         await using var fileStream = new FileStream(_configFile, FileMode.Create, FileAccess.Write);
         await JsonSerializer
-            .SerializeAsync(fileStream, data, cancellationToken: cancellationToken)
+            .SerializeAsync(fileStream, data, _jsonOptions, cancellationToken)
             .ConfigureAwait(false);
 
         await fileStream
             .FlushAsync(cancellationToken)
             .ConfigureAwait(false);
     }
-
-    [LoggerMessage(LogLevel.Information, "The application data directory was created")]
-    private partial void LogAppDataCreated();
 
     [LoggerMessage(LogLevel.Information, "The application configuration file was created")]
     private partial void LogConfigFileCreated();

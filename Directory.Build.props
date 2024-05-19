@@ -20,4 +20,8 @@
     <PackageProjectUrl>https://github.com/skarllot/PatrimonioTech</PackageProjectUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutomaticInterface" Version="2.3.0" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>

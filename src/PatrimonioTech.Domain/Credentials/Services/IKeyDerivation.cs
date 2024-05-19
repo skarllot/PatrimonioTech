@@ -12,5 +12,6 @@ public sealed record CreateKeyResult(string Salt, string EncryptedKey);
 public enum GetKeyError
 {
     InvalidSalt = 1,
-    InvalidEncryptedKey
+    InvalidEncryptedKey,
+    InvalidPassword
 }
