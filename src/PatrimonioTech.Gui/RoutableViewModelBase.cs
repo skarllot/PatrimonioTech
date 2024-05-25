@@ -7,7 +7,8 @@ using ReactiveUI.Validation.Contexts;
 
 namespace PatrimonioTech.Gui;
 
-public class RoutableViewModelBase : ViewModelBase, IRoutableViewModel, INotifyDataErrorInfo, IValidatableViewModel
+public class RoutableViewModelBase
+    : ViewModelBase, IRoutableViewModel, INotifyDataErrorInfo, IValidatableViewModel, IDisposable
 {
     private readonly ReactiveValidationSubject _validationSubject = new();
 
@@ -28,7 +29,13 @@ public class RoutableViewModelBase : ViewModelBase, IRoutableViewModel, INotifyD
 
     bool INotifyDataErrorInfo.HasErrors => _validationSubject.HasErrors;
 
-    public ValidationContext ValidationContext => _validationSubject.ValidationContext;
+    public IValidationContext ValidationContext => _validationSubject.ValidationContext;
 
     IEnumerable INotifyDataErrorInfo.GetErrors(string? propertyName) => _validationSubject.GetErrors(propertyName);
+
+    public void Dispose()
+    {
+        _validationSubject.Dispose();
+        GC.SuppressFinalize(this);
+    }
 }
