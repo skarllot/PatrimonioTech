@@ -29,7 +29,7 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
             select _keyDerivation.CreateKey(p, keySize, iterations);
 
         // Assert
-        (string? salt, string? encryptedKey) = result.Should().Succeed().And.Subject.Value;
+        var (salt, encryptedKey) = result.Should().Succeed().And.Subject.Value;
 
         salt.Should().NotBeEmpty();
         encryptedKey.Should().NotBeEmpty();
@@ -43,7 +43,7 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     public void TryGetKey_WithValidInput_ReturnsKey(string password, int keySize, int iterations)
     {
         // Arrange
-        (string salt, string encryptedKey) = (from p in Password.Create(password)
+        var (salt, encryptedKey) = (from p in Password.Create(password)
                 select _keyDerivation.CreateKey(p, keySize, iterations))
             .Value;
 
@@ -82,7 +82,7 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     public void TryGetKey_WithInvalidEncryptedKey_ReturnsFailure(string password, int keySize, int iterations)
     {
         // Arrange
-        (string salt, string encryptedKey) = (from p in Password.Create(password)
+        var (salt, encryptedKey) = (from p in Password.Create(password)
                 select _keyDerivation.CreateKey(p, keySize, iterations))
             .Value;
 
@@ -99,7 +99,7 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     public void TryGetKey_WithInvalidPassword_ReturnsFailure(string password, int keySize, int iterations)
     {
         // Arrange
-        (string salt, string encryptedKey) = (from p in Password.Create(password)
+        var (salt, encryptedKey) = (from p in Password.Create(password)
                 select _keyDerivation.CreateKey(p, keySize, iterations))
             .Value;
 
