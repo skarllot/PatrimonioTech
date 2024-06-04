@@ -1,6 +1,4 @@
-﻿using System.Reactive;
-using CSharpFunctionalExtensions;
-using LiteDB;
+﻿using LiteDB;
 using PatrimonioTech.App;
 using PatrimonioTech.App.SelfApplication;
 

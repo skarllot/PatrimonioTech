@@ -1,5 +1,4 @@
 ﻿using System.Security.Cryptography;
-using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;

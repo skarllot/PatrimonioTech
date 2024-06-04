@@ -35,7 +35,15 @@ public class RoutableViewModelBase
 
     public void Dispose()
     {
-        _validationSubject.Dispose();
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _validationSubject.Dispose();
+        }
     }
 }

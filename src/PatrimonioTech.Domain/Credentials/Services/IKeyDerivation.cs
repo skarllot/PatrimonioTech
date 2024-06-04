@@ -6,12 +6,3 @@ public interface IKeyDerivation
 
     Result<string, GetKeyError> TryGetKey(string password, string salt, string encryptedKey, int keySize, int iterations);
 }
-
-public sealed record CreateKeyResult(string Salt, string EncryptedKey);
-
-public enum GetKeyError
-{
-    InvalidSalt = 1,
-    InvalidEncryptedKey,
-    InvalidPassword
-}

@@ -1,5 +1,4 @@
-﻿using PatrimonioTech.Domain.Common;
-using PatrimonioTech.Domain.Common.ValueObjects;
+﻿using PatrimonioTech.Domain.Common.ValueObjects;
 
 namespace PatrimonioTech.Domain.TiposAtivos;
 
@@ -17,7 +16,7 @@ public sealed class TipoAtivo(NotEmptyString nome)
                 NotEmptyString.Create("FI-Infra"),
                 NotEmptyString.Create("Fundo")
             }
-            .Select(r => r.TryGetValue())
+            .Select(r => r.ToOption())
             .Choose(v => new TipoAtivo(v));
     }
 }

@@ -2,9 +2,9 @@
 
 public static class StringParser
 {
-    public static Maybe<string> NotNullOrWhitespace(string? value) =>
-        string.IsNullOrWhiteSpace(value) ? Maybe.None : Maybe.From(value);
+    public static Option<string> NotNullOrWhitespace(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? None : Some(value);
 
-    public static Maybe<string> HaveLength(string value, Func<int, bool> countPredicate) =>
-        countPredicate(value.Length) ? Maybe.From(value) : Maybe.None;
+    public static Option<string> HaveLength(string value, Func<int, bool> countPredicate) =>
+        countPredicate(value.Length) ? Some(value) : None;
 }

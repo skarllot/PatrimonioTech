@@ -1,7 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace PatrimonioTech.Domain.Common;
 
+[SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
 public static class CollectionExtensions
 {
     public static TValue GetOrAdd<TKey, TValue>(
@@ -9,7 +11,7 @@ public static class CollectionExtensions
         TKey key,
         Func<TKey, TValue> valueFactory) where TKey : notnull
     {
-        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
 
         if (!exists)
             existingValue = valueFactory(key);
@@ -24,7 +26,7 @@ public static class CollectionExtensions
         Func<TKey, TValue, TValue> updateValueFactory)
         where TKey : notnull
     {
-        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
 
         existingValue = exists
             ? updateValueFactory(key, existingValue!)
@@ -40,7 +42,7 @@ public static class CollectionExtensions
         Func<TKey, TValue, TArg, TValue> updateValueFactory,
         TArg factoryArgument) where TKey : notnull
     {
-        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
 
         existingValue = exists
             ? updateValueFactory(key, existingValue!, factoryArgument)
@@ -56,7 +58,7 @@ public static class CollectionExtensions
         Action<TKey, TValue, TArg> updateValueFactory,
         TArg factoryArgument) where TKey : notnull
     {
-        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out bool exists);
+        ref var existingValue = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
 
         if (exists)
             updateValueFactory(key, existingValue!, factoryArgument);

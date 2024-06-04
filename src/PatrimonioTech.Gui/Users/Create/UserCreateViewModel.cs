@@ -1,7 +1,6 @@
-﻿using System.Reactive;
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using CSharpFunctionalExtensions;
+using System.Reactive.Subjects;
 using PatrimonioTech.App.Credentials.v1.AddUser;
 using PatrimonioTech.App.Credentials.v1.GetUserAvailability;
 using PatrimonioTech.Gui.Common;
@@ -18,8 +17,15 @@ public partial class UserCreateViewModel : RoutableViewModelBase
     [Notify] private string _password = string.Empty;
     [Notify] private string _passwordConfirmation = string.Empty;
 
-    public ReactiveCommand<Unit, Unit> Cancel { get; }
-    public ReactiveCommand<Unit, Result<Unit, CredentialAddUserResult>> Create { get; }
+    // Intermediate Streams
+    private readonly Subject<bool> _canCreateSubject = new();
+
+    // Use Cases
+    private Func<string, IObservable<UserGetAvailabilityResponse>> _getUserAvailability;
+
+    // Commands
+    public ReactiveCommand<Unit, IRoutableViewModel> Cancel { get; }
+    public ReactiveCommand<Unit, Result<Unit, CredentialAddUserError>> Create { get; }
 
     public UserCreateViewModel(
         IScreen hostScreen,
@@ -28,7 +34,7 @@ public partial class UserCreateViewModel : RoutableViewModelBase
         : base(hostScreen)
     {
         // USE CASES
-        var getUserAvailability = (string userName) => Observable
+        _getUserAvailability = userName => Observable
             .Return(new UserGetAvailabilityRequest(userName))
             .SelectMany(getUserAvailabilityUseCase.Execute);
 
@@ -36,6 +42,30 @@ public partial class UserCreateViewModel : RoutableViewModelBase
             .Return(new CredentialAddUserRequest(r.UserName, r.Password))
             .SelectMany(addUserUseCase.Execute);
 
+        // CANCEL COMMAND
+        Cancel = ReactiveCommand.CreateFromObservable(() => hostScreen.Router.NavigateBack.Execute());
+
+        // CREATE COMMAND
+        Create = ReactiveCommand.CreateFromObservable(
+            (Unit _) => addUser((UserName, Password)),
+            _canCreateSubject);
+
+        // VALIDATIONS
+        this.WhenActivated(OnViewActivated);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _canCreateSubject.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private void OnViewActivated(CompositeDisposable disposable)
+    {
         // USERNAME INPUT
         var whenUserNameChanged = this.WhenAnyValue(vm => vm.UserName);
 
@@ -43,7 +73,7 @@ public partial class UserCreateViewModel : RoutableViewModelBase
             .Select(v => !v.AsSpan().Trim().IsWhiteSpace());
 
         var isUserAvailable = whenUserNameChanged
-            .SelectMany(getUserAvailability)
+            .SelectMany(_getUserAvailability)
             .Select(r => !r.Exists);
 
         // PASSWORD INPUT
@@ -54,39 +84,30 @@ public partial class UserCreateViewModel : RoutableViewModelBase
 
         // PASSWORD CONFIRMATION INPUT
         var isConfirmationMatch = Observable
-            .CombineLatest(whenPasswordChanged, this.WhenAnyValue(vm => vm.PasswordConfirmation), (v1, v2) => v1 == v2);
-
-        // CANCEL COMMAND
-        Cancel = ReactiveCommand.Create(() => { hostScreen.Router.NavigateBack.Execute(); });
+            .CombineLatest(
+                whenPasswordChanged,
+                this.WhenAnyValue(vm => vm.PasswordConfirmation),
+                (v1, v2) => string.Equals(v1, v2, StringComparison.Ordinal));
 
         // CREATE COMMAND
-        var canCreate = Observable
+        Observable
             .CombineLatest(
                 isUserValid,
                 isPasswordValid,
                 isConfirmationMatch,
                 isUserAvailable,
                 (v1, v2, v3, v4) => v1 && v2 && v3 && v4)
-            .DistinctUntilChanged();
-
-        Create = ReactiveCommand.CreateFromObservable(
-            (Unit _) => addUser((UserName, Password)),
-            canCreate);
+            .DistinctUntilChanged()
+            .Subscribe(_canCreateSubject, disposable);
 
         // VALIDATIONS
-        this.WhenActivated(
-            disposable =>
-            {
-                this.ValidationRule(vm => vm.UserName, isUserAvailable, "Usuário já existe").DisposeWith(disposable);
-                this.ValidationRule(vm => vm.Password, isPasswordValid, "Senha muito curta").DisposeWith(disposable);
+        this.ValidationRule(vm => vm.UserName, isUserAvailable, "Usuário já existe").DisposeWith(disposable);
+        this.ValidationRule(vm => vm.Password, isPasswordValid, "Senha muito curta").DisposeWith(disposable);
 
-                this
-                    .ValidationRule(vm => vm.PasswordConfirmation, isConfirmationMatch, "As senhas não coincidem")
-                    .DisposeWith(disposable);
+        this.ValidationRule(vm => vm.PasswordConfirmation, isConfirmationMatch, "As senhas não coincidem")
+            .DisposeWith(disposable);
 
-                Create
-                    .SelectMany(_ => hostScreen.Router.NavigateBack.Execute())
-                    .Subscribe(disposable);
-            });
+        Create.SelectMany(_ => HostScreen.Router.NavigateBack.Execute())
+            .Subscribe(disposable);
     }
 }

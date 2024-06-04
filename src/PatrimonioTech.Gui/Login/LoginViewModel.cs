@@ -1,10 +1,9 @@
 ﻿using System.Collections.Immutable;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using PatrimonioTech.App.Credentials.v1.GetUserInfo;
 using PatrimonioTech.App.Credentials.v1.GetUsers;
-using PatrimonioTech.Domain.Common;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
 using PatrimonioTech.Gui.Common;
@@ -23,11 +22,27 @@ public partial class LoginViewModel : RoutableViewModelBase
     [Notify] private string _usuario = string.Empty;
     [Notify] private string _senha = string.Empty;
 
+    // Intermediate Streams
+    private readonly Subject<bool> _canLoginSubject = new();
+    private readonly Subject<ImmutableList<string>> _existingUsers = new();
+
+    // View Model Factories
+    private readonly IFactory<DashboardViewModel> _dashboard;
+
+    // Use Cases
+    private readonly Func<IObservable<ImmutableList<string>>> _getAllUserCredentials;
+
+    private readonly Func<
+        (string userName, string password),
+        IObservable<Result<CredentialGetUserInfoResponse, CredentialGetUserInfoError>>
+    > _getUserInfo;
+
+    // Commands
     public ReactiveCommand<Unit, (string Usuario, string Senha)> Enter { get; }
-    public ReactiveCommand<Unit, Unit> CreateNew { get; }
+    public ReactiveCommand<Unit, IRoutableViewModel> CreateNew { get; }
 
     // Presentation Streams
-    public IObservable<ImmutableList<string>> UsuariosExistentes { get; }
+    public IObservable<ImmutableList<string>> UsuariosExistentes => _existingUsers;
 
     public LoginViewModel(
         IScreen hostScreen,
@@ -37,25 +52,49 @@ public partial class LoginViewModel : RoutableViewModelBase
         IFactory<DashboardViewModel> dashboard)
         : base(hostScreen)
     {
+        // VIEW MODEL FACTORIES
+        _dashboard = dashboard;
+
         // USE CASES
-        var allUserCredentials = Observable
+        _getAllUserCredentials = () => Observable
             .FromAsync(credentialGetUsersUseCase.Execute)
-            .Select(x => x.UserNames)
-            .Replay(1)
-            .RefCount();
+            .Select(x => x.UserNames);
 
-        var getUserInfo = ((string userName, string password) r) => Observable
+        _getUserInfo = r => Observable
             .Return(new CredentialGetUserInfoRequest(r.userName, r.password))
-            .SelectMany(credentialGetUserInfoUseCase.Execute)
-            .Replay(1)
-            .RefCount();
+            .SelectMany(credentialGetUserInfoUseCase.Execute);
 
+        // ENTER COMMAND
+        Enter = ReactiveCommand.Create(
+            () => (Usuario, Senha),
+            _canLoginSubject);
+
+        // CREATE NEW COMMAND
+        CreateNew = ReactiveCommand.CreateFromObservable(
+            () => hostScreen.Router.Navigate.Execute(userCreate.Create()));
+
+        this.WhenActivated(OnViewActivated);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _canLoginSubject.Dispose();
+            _existingUsers.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private void OnViewActivated(CompositeDisposable disposable)
+    {
         // USER INPUT
         var whenUserChanged = this.WhenAnyValue(vm => vm.Usuario);
 
         var isUserSelected = whenUserChanged
-            .CombineLatest(allUserCredentials)
-            .Select(x => x.Second.Contains(x.First));
+            .CombineLatest(_getAllUserCredentials())
+            .Select(x => x.Second.Contains(x.First, StringComparer.OrdinalIgnoreCase));
 
         // PASSWORD INPUT
         var whenPasswordChanged = this.WhenAnyValue(vm => vm.Senha);
@@ -64,48 +103,36 @@ public partial class LoginViewModel : RoutableViewModelBase
             .Select(x => x.Length >= Password.PasswordMinLength);
 
         // ENTER COMMAND
-        var canLogin = Observable
+        Observable
             .CombineLatest(isUserSelected, isPasswordValid, (v1, v2) => v1 && v2)
-            .DistinctUntilChanged();
-
-        Enter = ReactiveCommand.Create(
-            () => (Usuario, Senha),
-            canLogin);
-
-        // CREATE NEW COMMAND
-        CreateNew = ReactiveCommand.Create(
-            () => { hostScreen.Router.Navigate.Execute(userCreate.Create()); });
+            .DistinctUntilChanged()
+            .Subscribe(_canLoginSubject, disposable);
 
         // USER LIST OUTPUT
-        UsuariosExistentes = allUserCredentials;
+        _getAllUserCredentials().Subscribe(_existingUsers, disposable);
 
         // VALIDATIONS
-        var userInfos = Enter.SelectMany(getUserInfo);
+        var userInfos = Enter.SelectMany(_getUserInfo);
 
         var passwordValidation = userInfos
-            .Select(x => x.Case() is not CredentialGetUserInfoError { Value: GetKeyError.InvalidPassword })
-            .StartWith(true);
-
-        var userValidation = userInfos
             .Select(
-                x => x.Case() is not CredentialGetUserInfoError
+                x => x.Case() is not CredentialGetUserInfoError.CryptographyError
                 {
-                    Value: CredentialGetUserInfoError.Other.UserNotFound
+                    Error: GetKeyError.InvalidPassword
                 })
             .StartWith(true);
 
-        this.WhenActivated(
-            disposable =>
-            {
-                userInfos
-                    .Successes()
-                    .SwitchSelect(_ => hostScreen.Router.Navigate.Execute(dashboard.Create()))
-                    .Subscribe(disposable);
+        var userValidation = userInfos
+            .Select(x => x.Case() is not CredentialGetUserInfoError.UserNotFound)
+            .StartWith(true);
 
-                this.ValidationRule(vm => vm.Senha, passwordValidation, "Senha inválida").DisposeWith(disposable);
-                this.ValidationRule(vm => vm.Senha, isPasswordValid, "Senha muito curta").DisposeWith(disposable);
+        userInfos.Successes()
+            .SwitchSelect(_ => HostScreen.Router.Navigate.Execute(_dashboard.Create()))
+            .Subscribe(disposable);
 
-                this.ValidationRule(vm => vm.Usuario, userValidation, "Usuário não encontrado").DisposeWith(disposable);
-            });
+        this.ValidationRule(vm => vm.Senha, passwordValidation, "Senha inválida").DisposeWith(disposable);
+        this.ValidationRule(vm => vm.Senha, isPasswordValid, "Senha muito curta").DisposeWith(disposable);
+
+        this.ValidationRule(vm => vm.Usuario, userValidation, "Usuário não encontrado").DisposeWith(disposable);
     }
 }

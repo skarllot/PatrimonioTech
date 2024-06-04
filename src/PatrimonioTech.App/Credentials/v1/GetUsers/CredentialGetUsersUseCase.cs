@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using PatrimonioTech.Domain.Common;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.App.Credentials.v1.GetUsers;

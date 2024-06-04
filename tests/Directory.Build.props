@@ -10,4 +10,12 @@
     <NoWarn>$(NoWarn);CA1716</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="FxKit.Testing" Version="0.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="FxKit.Testing.FluentAssertions" />
+  </ItemGroup>
+
 </Project>

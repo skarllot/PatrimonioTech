@@ -1,5 +1,4 @@
-﻿using PatrimonioTech.Domain.Common;
-using PatrimonioTech.Domain.Credentials.Services;
+﻿using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.App.Credentials.v1.GetUserAvailability;
 
@@ -12,7 +11,7 @@ public sealed class UserGetAvailabilityUseCase(
         UserGetAvailabilityRequest request,
         CancellationToken cancellationToken)
     {
-        var userCredentials = await repository.GetAll(cancellationToken);
+        var userCredentials = await repository.GetAll(cancellationToken).ConfigureAwait(false);
 
         return new UserGetAvailabilityResponse(
             userCredentials.Any(x => x.Name.Equals(request.UserName, StringComparison.CurrentCultureIgnoreCase)));

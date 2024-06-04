@@ -2,8 +2,8 @@
 
 namespace PatrimonioTech.Domain.Escrituradores;
 
-public sealed class Escriturador(NotEmptyString nome, Maybe<Cnpj> cnpj)
+public sealed class Escriturador(NotEmptyString nome, Option<Cnpj> cnpj)
 {
     public NotEmptyString Nome { get; } = nome;
-    public Maybe<Cnpj> Cnpj { get; } = cnpj;
+    public Option<Cnpj> Cnpj { get; } = cnpj;
 }

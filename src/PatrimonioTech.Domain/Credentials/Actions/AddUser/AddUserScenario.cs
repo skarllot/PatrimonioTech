@@ -1,6 +1,4 @@
-﻿using OneOf;
-using PatrimonioTech.Domain.Common;
-using PatrimonioTech.Domain.Common.Parsers;
+﻿using PatrimonioTech.Domain.Common.Parsers;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Domain.Credentials.Actions.AddUser;
@@ -18,35 +16,17 @@ public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
     {
         return from name in StringParser.NotNullOrWhitespace(command.Name)
                 .Where(v => v.Length >= NameMinLength)
-                .ToResult(() => AddUserCredentialError.Other.NameTooShort)
-                .MapError(e => (AddUserCredentialError)e)
+                .OkOrElse(AddUserCredentialError.NameTooShort.Of)
             from password in Password.Create(command.Password)
-                .MapError(e => (AddUserCredentialError)e)
+                .MapErr(AddUserCredentialError.InvalidPassword.Of)
             from keySize in command.KeySize
-                .Ensure(v => v >= KeySizeMinimum, AddUserCredentialError.Other.KeySizeTooLow)
-                .Ensure(v => v <= KeySizeMaximum, AddUserCredentialError.Other.KeySizeTooHigh)
-                .MapError(e => (AddUserCredentialError)e)
+                .Ensure(v => v >= KeySizeMinimum, AddUserCredentialError.KeySizeTooLow.Of)
+                .Ensure(v => v <= KeySizeMaximum, AddUserCredentialError.KeySizeTooHigh.Of)
             from iterations in command.Iterations
-                .Ensure(v => v >= IterationsMinimum, AddUserCredentialError.Other.IterationsTooLow)
-                .Ensure(v => v <= IterationsMaximum, AddUserCredentialError.Other.IterationsTooHigh)
-                .MapError(e => (AddUserCredentialError)e)
+                .Ensure(v => v >= IterationsMinimum, AddUserCredentialError.IterationsTooLow.Of)
+                .Ensure(v => v <= IterationsMaximum, AddUserCredentialError.IterationsTooHigh.Of)
             let key = keyDerivation.CreateKey(password, keySize, iterations)
             let dbId = Guid.NewGuid()
             select new UserCredentialAdded(name, key.Salt, key.EncryptedKey, dbId, keySize, iterations);
-    }
-}
-
-[GenerateOneOf]
-public partial class AddUserCredentialError : OneOfBase<
-    PasswordError,
-    AddUserCredentialError.Other>
-{
-    public enum Other
-    {
-        NameTooShort = 1,
-        KeySizeTooLow,
-        KeySizeTooHigh,
-        IterationsTooLow,
-        IterationsTooHigh
     }
 }
