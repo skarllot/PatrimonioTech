@@ -14,14 +14,8 @@ public sealed partial class Password
 
     public static Result<Password, PasswordError> Create(string value)
     {
-        return StringParser.NotNullOrWhitespace(value).ToResult(PasswordError.Empty)
+        return StringParser.NotNullOrWhitespace(value).OkOrElse(PasswordError.Empty)
             .Ensure(v => v.Length >= PasswordMinLength, PasswordError.TooShort)
             .Map(v => new Password(v));
     }
-}
-
-public enum PasswordError
-{
-    Empty = 1,
-    TooShort
 }

@@ -1,8 +1,4 @@
-﻿using System.Reactive;
-using CSharpFunctionalExtensions;
-using OneOf;
-using PatrimonioTech.Domain.Common;
-using PatrimonioTech.Domain.Credentials;
+﻿using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
 
@@ -16,28 +12,24 @@ public class CredentialAddUserUseCase(
     IKeyDerivation keyDerivation)
     : ICredentialAddUserUseCase
 {
-    public Task<Result<Unit, CredentialAddUserResult>> Execute(
+    public Task<Result<Unit, CredentialAddUserError>> Execute(
         CredentialAddUserRequest request,
         CancellationToken cancellationToken)
     {
         return from scnRes in addUserScenario
                 .Execute(new AddUserCredential(request.Name, request.Password, request.KeySize, request.Iterations))
-                .MapError(e => (CredentialAddUserResult)e)
+                .MapErr(CredentialAddUserError.BusinessError.λ)
+                .ToTask()
             let model = UserCredential.Create(scnRes)
             from repoRes in userCredentialRepository.Add(model, cancellationToken)
-                .MapError(e => (CredentialAddUserResult)e)
+                .MapErrT(CredentialAddUserError.StorageError.λ)
             from key in keyDerivation
                 .TryGetKey(request.Password, model.Salt, model.Key, model.KeySize, model.Iterations)
-                .MapError(e => (CredentialAddUserResult)e)
+                .MapErr(CredentialAddUserError.CryptographyError.λ)
+                .ToTask()
             from db in databaseAdmin.CreateDatabase(model.Database, key)
-                .MapError(e => (CredentialAddUserResult)e)
+                .MapErr(CredentialAddUserError.DatabaseError.λ)
+                .ToTask()
             select Unit.Default;
     }
 }
-
-[GenerateOneOf]
-public partial class CredentialAddUserResult : OneOfBase<
-    AddUserCredentialError,
-    UserCredentialAddError,
-    GetKeyError,
-    CreateDatabaseError>;

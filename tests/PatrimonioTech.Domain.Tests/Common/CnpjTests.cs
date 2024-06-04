@@ -15,7 +15,7 @@ public class CnpjTests
     {
         var cnpj = Cnpj.Create(input);
 
-        cnpj.Should().Succeed().And.Subject.Value.Value.Should().Be(expected);
+        cnpj.Should().BeOk().Value.Should().Be(expected);
     }
 
     [Theory]
@@ -28,6 +28,6 @@ public class CnpjTests
     {
         var cnpj = Cnpj.Create(input);
 
-        cnpj.Should().Fail();
+        cnpj.Should().BeErr();
     }
 }

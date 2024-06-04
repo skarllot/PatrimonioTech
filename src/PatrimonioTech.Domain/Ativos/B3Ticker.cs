@@ -26,11 +26,11 @@ public sealed record B3Ticker(B3TickerName Name, B3TickerCode Code)
                 throw new JsonException("Invalid B3 ticker");
 
             var tickerName = B3TickerName.Create(value[..4]);
-            if (tickerName.IsFailure)
+            if (!tickerName.TryGet(out var name, out _))
                 throw new JsonException("Invalid B3 ticker name");
 
-            int code = int.Parse(value.AsSpan(4), CultureInfo.InvariantCulture);
-            return new B3Ticker(tickerName.Value, (B3TickerCode)code);
+            var code = int.Parse(value.AsSpan(4), CultureInfo.InvariantCulture);
+            return new B3Ticker(name, (B3TickerCode)code);
         }
     }
 }

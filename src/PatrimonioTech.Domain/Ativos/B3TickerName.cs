@@ -11,19 +11,15 @@ public sealed partial class B3TickerName
 
     public string Value { get; }
 
-    [GeneratedRegex("^[A-Z0-9]{4}$")]
+    [GeneratedRegex("^[A-Z0-9]{4}$", RegexOptions.Compiled, 150)]
     private static partial Regex GetValidationPattern();
 
     public static Result<B3TickerName, B3TickerNameError> Create(string value)
     {
-        return StringParser.NotNullOrWhitespace(value).ToResult(B3TickerNameError.Empty)
+        return StringParser.NotNullOrWhitespace(value).OkOrElse(B3TickerNameError.Empty)
             .Ensure(v => GetValidationPattern().IsMatch(value), B3TickerNameError.Invalid)
             .Map(v => new B3TickerName(v));
     }
-}
 
-public enum B3TickerNameError
-{
-    Empty = 1,
-    Invalid
+    public override string ToString() => Value;
 }

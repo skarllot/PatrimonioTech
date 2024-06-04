@@ -22,6 +22,14 @@
 
   <ItemGroup>
     <PackageReference Include="AutomaticInterface" Version="2.3.0" PrivateAssets="all" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.154" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="FxKit" />
+    <Using Include="FxKit.Prelude" Static="True" />
+    <Using Include="PatrimonioTech.Domain.Common" />
+    <Using Include="System.Reactive.Unit" Alias="Unit" />
   </ItemGroup>
 
 </Project>

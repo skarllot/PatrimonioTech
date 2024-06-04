@@ -1,7 +1,5 @@
-﻿using System.Reactive;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PatrimonioTech.App.SelfApplication;
@@ -42,7 +40,7 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
 
         current.Add(userCredential.ToModel());
 
-        await Write(current, cancellationToken);
+        await Write(current, cancellationToken).ConfigureAwait(false);
 
         LogNewUserAdded(userCredential.Name);
         return Unit.Default;
@@ -68,16 +66,19 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
 
         try
         {
-            await using var fileStream = new FileStream(_configFile, FileMode.OpenOrCreate, FileAccess.Read);
-            if (fileStream.Length == 0)
+            var fileStream = new FileStream(_configFile, FileMode.OpenOrCreate, FileAccess.Read);
+            await using (fileStream.ConfigureAwait(false))
             {
-                return new List<UserCredentialModel>();
-            }
+                if (fileStream.Length == 0)
+                {
+                    return [];
+                }
 
-            var result = await JsonSerializer
-                .DeserializeAsync<List<UserCredentialModel>>(fileStream, _jsonOptions, cancellationToken)
-                .ConfigureAwait(false);
-            return result ?? [];
+                var result = await JsonSerializer
+                    .DeserializeAsync<List<UserCredentialModel>>(fileStream, _jsonOptions, cancellationToken)
+                    .ConfigureAwait(false);
+                return result ?? [];
+            }
         }
         catch (JsonException e)
         {
@@ -95,14 +96,17 @@ public partial class FileUserCredentialRepository : IUserCredentialRepository
 
     private async Task Write(List<UserCredentialModel> data, CancellationToken cancellationToken)
     {
-        await using var fileStream = new FileStream(_configFile, FileMode.Create, FileAccess.Write);
-        await JsonSerializer
-            .SerializeAsync(fileStream, data, _jsonOptions, cancellationToken)
-            .ConfigureAwait(false);
+        var fileStream = new FileStream(_configFile, FileMode.Create, FileAccess.Write);
+        await using (fileStream.ConfigureAwait(false))
+        {
+            await JsonSerializer
+                .SerializeAsync(fileStream, data, _jsonOptions, cancellationToken)
+                .ConfigureAwait(false);
 
-        await fileStream
-            .FlushAsync(cancellationToken)
-            .ConfigureAwait(false);
+            await fileStream
+                .FlushAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
     }
 
     [LoggerMessage(LogLevel.Information, "The application configuration file was created")]

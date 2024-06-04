@@ -14,18 +14,10 @@ public sealed partial class Cnpj
 
     public static Result<Cnpj, CnpjError> Create(string value)
     {
-        return StringParser.NotNullOrWhitespace(value).ToResult(CnpjError.Empty)
+        return StringParser.NotNullOrWhitespace(value).OkOrElse(CnpjError.Empty)
             .Ensure(v => v.Length >= Length, CnpjError.TooShort)
-            .Bind(v => Parser.TryNormalize(v))
+            .FlatMap(v => Parser.TryNormalize(v))
             .Ensure(Parser.IsValid, CnpjError.Invalid)
             .Map(v => new Cnpj(v));
     }
-}
-
-public enum CnpjError
-{
-    Empty = 1,
-    TooShort,
-    TooLong,
-    Invalid
 }
