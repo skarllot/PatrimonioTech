@@ -1,5 +1,5 @@
-﻿using Generator.Equals;
-using PatrimonioTech.Domain.Common.Parsers;
+﻿using FxKit.Parsers;
+using Generator.Equals;
 
 namespace PatrimonioTech.Domain.Common.ValueObjects;
 
@@ -14,7 +14,7 @@ public sealed partial class Cnpj
 
     public static Result<Cnpj, CnpjError> Create(string value)
     {
-        return StringParser.NotNullOrWhitespace(value).OkOrElse(CnpjError.Empty)
+        return StringParser.NonNullOrWhiteSpace(value).OkOr(CnpjError.Empty)
             .Ensure(v => v.Length >= Length, CnpjError.TooShort)
             .FlatMap(v => Parser.TryNormalize(v))
             .Ensure(Parser.IsValid, CnpjError.Invalid)

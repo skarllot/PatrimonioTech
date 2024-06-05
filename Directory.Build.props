@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutomaticInterface" Version="2.3.0" PrivateAssets="all" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.154" PrivateAssets="all" />
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.155" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
