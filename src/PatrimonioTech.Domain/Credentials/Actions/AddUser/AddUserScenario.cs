@@ -1,4 +1,4 @@
-﻿using PatrimonioTech.Domain.Common.Parsers;
+﻿using FxKit.Parsers;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Domain.Credentials.Actions.AddUser;
@@ -14,7 +14,7 @@ public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
 
     public Result<UserCredentialAdded, AddUserCredentialError> Execute(AddUserCredential command)
     {
-        return from name in StringParser.NotNullOrWhitespace(command.Name)
+        return from name in StringParser.NonNullOrWhiteSpace(command.Name)
                 .Where(v => v.Length >= NameMinLength)
                 .OkOrElse(AddUserCredentialError.NameTooShort.Of)
             from password in Password.Create(command.Password)

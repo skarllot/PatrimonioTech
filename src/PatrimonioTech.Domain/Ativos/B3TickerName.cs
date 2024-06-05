@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using FxKit.Parsers;
 using Generator.Equals;
-using PatrimonioTech.Domain.Common.Parsers;
 
 namespace PatrimonioTech.Domain.Ativos;
 
@@ -16,7 +16,7 @@ public sealed partial class B3TickerName
 
     public static Result<B3TickerName, B3TickerNameError> Create(string value)
     {
-        return StringParser.NotNullOrWhitespace(value).OkOrElse(B3TickerNameError.Empty)
+        return StringParser.NonNullOrWhiteSpace(value).OkOr(B3TickerNameError.Empty)
             .Ensure(v => GetValidationPattern().IsMatch(value), B3TickerNameError.Invalid)
             .Map(v => new B3TickerName(v));
     }

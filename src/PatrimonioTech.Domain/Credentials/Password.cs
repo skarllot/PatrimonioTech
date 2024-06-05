@@ -1,5 +1,5 @@
-﻿using Generator.Equals;
-using PatrimonioTech.Domain.Common.Parsers;
+﻿using FxKit.Parsers;
+using Generator.Equals;
 
 namespace PatrimonioTech.Domain.Credentials;
 
@@ -14,7 +14,7 @@ public sealed partial class Password
 
     public static Result<Password, PasswordError> Create(string value)
     {
-        return StringParser.NotNullOrWhitespace(value).OkOrElse(PasswordError.Empty)
+        return StringParser.NonNullOrWhiteSpace(value).OkOr(PasswordError.Empty)
             .Ensure(v => v.Length >= PasswordMinLength, PasswordError.TooShort)
             .Map(v => new Password(v));
     }

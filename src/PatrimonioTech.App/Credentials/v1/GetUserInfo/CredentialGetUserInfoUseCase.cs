@@ -1,4 +1,5 @@
-﻿using PatrimonioTech.Domain.Credentials.Services;
+﻿using FxKit.Extensions;
+using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.App.Credentials.v1.GetUserInfo;
 
@@ -16,7 +17,7 @@ public class CredentialGetUserInfoUseCase(
                 !.ToOptionAsync()
                 .OkOrElseT(CredentialGetUserInfoError.Unexpected.Of)
             from foundUser in userCredentials
-                .TryFirst(x => x.Name.Equals(request.UserName, StringComparison.CurrentCultureIgnoreCase))
+                .FirstOrNone(x => x.Name.Equals(request.UserName, StringComparison.CurrentCultureIgnoreCase))
                 .OkOrElse(CredentialGetUserInfoError.UserNotFound.Of)
                 .ToTask()
             from password in keyDerivation

@@ -17,6 +17,6 @@ public sealed class TipoAtivo(NotEmptyString nome)
                 NotEmptyString.Create("Fundo")
             }
             .Select(r => r.ToOption())
-            .Choose(v => new TipoAtivo(v));
+            .SomesMap(v => new TipoAtivo(v));
     }
 }
