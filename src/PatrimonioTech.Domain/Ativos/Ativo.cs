@@ -4,7 +4,7 @@ using PatrimonioTech.Domain.TiposAtivos;
 
 namespace PatrimonioTech.Domain.Ativos;
 
-public class Ativo(
+public sealed class Ativo(
     TipoAtivo tipoAtivo,
     B3Ticker ticker,
     Option<Cnpj> cnpj = default,

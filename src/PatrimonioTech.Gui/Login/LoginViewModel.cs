@@ -16,7 +16,7 @@ using ReactiveUI.Validation.Extensions;
 
 namespace PatrimonioTech.Gui.Login;
 
-public partial class LoginViewModel : RoutableViewModelBase
+public sealed partial class LoginViewModel : RoutableViewModelBase
 {
     // Source Streams
     [Notify] private string _usuario = string.Empty;

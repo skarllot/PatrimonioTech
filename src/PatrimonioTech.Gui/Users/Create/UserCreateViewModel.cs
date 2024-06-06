@@ -10,7 +10,7 @@ using ReactiveUI.Validation.Extensions;
 
 namespace PatrimonioTech.Gui.Users.Create;
 
-public partial class UserCreateViewModel : RoutableViewModelBase
+public sealed partial class UserCreateViewModel : RoutableViewModelBase
 {
     // Source Streams
     [Notify] private string _userName = string.Empty;

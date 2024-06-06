@@ -4,7 +4,7 @@ using PatrimonioTech.Domain.Credentials.Services;
 namespace PatrimonioTech.App.Credentials.v1.GetUsers;
 
 [GenerateAutomaticInterface]
-public class CredentialGetUsersUseCase(
+public sealed class CredentialGetUsersUseCase(
     IUserCredentialRepository userCredentialRepository)
     : ICredentialGetUsersUseCase
 {

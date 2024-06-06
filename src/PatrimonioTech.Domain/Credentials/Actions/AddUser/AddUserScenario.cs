@@ -4,7 +4,7 @@ using PatrimonioTech.Domain.Credentials.Services;
 namespace PatrimonioTech.Domain.Credentials.Actions.AddUser;
 
 [GenerateAutomaticInterface]
-public class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
+public sealed class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
 {
     private const int NameMinLength = 3;
     private const int KeySizeMinimum = 128;

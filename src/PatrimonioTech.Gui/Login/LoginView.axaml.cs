@@ -3,7 +3,7 @@ using ReactiveUI;
 
 namespace PatrimonioTech.Gui.Login;
 
-public partial class LoginView : ReactiveUserControl<LoginViewModel>
+public sealed partial class LoginView : ReactiveUserControl<LoginViewModel>
 {
     public LoginView()
     {

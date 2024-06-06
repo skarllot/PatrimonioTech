@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.App.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.Infra.Tests", "tests\PatrimonioTech.Infra.Tests\PatrimonioTech.Infra.Tests.csproj", "{EC15A9B9-A991-44C4-ABF9-FADEB8B8FD38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatrimonioTech.Gui.Desktop.Tests", "tests\PatrimonioTech.Gui.Desktop.Tests\PatrimonioTech.Gui.Desktop.Tests.csproj", "{B97C1281-9D36-434A-8D92-7C6030AF021B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,7 @@ Global
 		{365EB418-6461-4167-82D3-666D130B865F} = {F43253AB-D4A6-4748-A40C-6A82DEC3CDC4}
 		{EE121079-C008-4519-A9E1-764E86AD6988} = {F43253AB-D4A6-4748-A40C-6A82DEC3CDC4}
 		{EC15A9B9-A991-44C4-ABF9-FADEB8B8FD38} = {F43253AB-D4A6-4748-A40C-6A82DEC3CDC4}
+		{B97C1281-9D36-434A-8D92-7C6030AF021B} = {F43253AB-D4A6-4748-A40C-6A82DEC3CDC4}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{70D09FAD-F953-40C9-A7DF-D4911B53ADBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -83,5 +86,9 @@ Global
 		{EC15A9B9-A991-44C4-ABF9-FADEB8B8FD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC15A9B9-A991-44C4-ABF9-FADEB8B8FD38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC15A9B9-A991-44C4-ABF9-FADEB8B8FD38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B97C1281-9D36-434A-8D92-7C6030AF021B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B97C1281-9D36-434A-8D92-7C6030AF021B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B97C1281-9D36-434A-8D92-7C6030AF021B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B97C1281-9D36-434A-8D92-7C6030AF021B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

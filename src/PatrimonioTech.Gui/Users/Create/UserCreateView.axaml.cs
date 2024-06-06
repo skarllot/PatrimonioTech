@@ -3,7 +3,7 @@ using ReactiveUI;
 
 namespace PatrimonioTech.Gui.Users.Create;
 
-public partial class UserCreateView : ReactiveUserControl<UserCreateViewModel>
+public sealed partial class UserCreateView : ReactiveUserControl<UserCreateViewModel>
 {
     public UserCreateView()
     {

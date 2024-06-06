@@ -1,10 +1,10 @@
 ﻿using LiteDB;
-using PatrimonioTech.App;
+using PatrimonioTech.App.Database;
 using PatrimonioTech.App.SelfApplication;
 
-namespace PatrimonioTech.Infra;
+namespace PatrimonioTech.Infra.Database;
 
-public class LiteDbDatabaseAdmin(ILocalPathProvider localPathProvider, BsonMapper bsonMapper)
+public sealed class LiteDbDatabaseAdmin(ILocalPathProvider localPathProvider, BsonMapper bsonMapper)
     : IDatabaseAdmin
 {
     public Result<Unit, CreateDatabaseError> CreateDatabase(Guid fileId, string password)
