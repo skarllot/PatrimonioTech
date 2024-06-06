@@ -1,4 +1,5 @@
 ﻿using FxKit.CompilerServices;
+using PatrimonioTech.App.Database;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
 

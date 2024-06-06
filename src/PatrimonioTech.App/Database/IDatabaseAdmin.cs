@@ -1,4 +1,4 @@
-﻿namespace PatrimonioTech.App;
+﻿namespace PatrimonioTech.App.Database;
 
 public interface IDatabaseAdmin
 {

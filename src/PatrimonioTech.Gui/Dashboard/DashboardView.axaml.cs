@@ -3,7 +3,7 @@ using ReactiveUI;
 
 namespace PatrimonioTech.Gui.Dashboard;
 
-public partial class DashboardView : ReactiveUserControl<DashboardViewModel>
+public sealed partial class DashboardView : ReactiveUserControl<DashboardViewModel>
 {
     public DashboardView()
     {

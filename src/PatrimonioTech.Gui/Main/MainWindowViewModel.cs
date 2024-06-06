@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace PatrimonioTech.Gui.Main;
 
-public class MainWindowViewModel : ViewModelBase, IScreen
+public sealed class MainWindowViewModel : ViewModelBase, IScreen
 {
     public MainWindowViewModel(IFactory<LoginViewModel> login)
     {

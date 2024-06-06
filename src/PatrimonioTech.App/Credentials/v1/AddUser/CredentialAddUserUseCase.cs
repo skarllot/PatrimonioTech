@@ -1,11 +1,12 @@
-﻿using PatrimonioTech.Domain.Credentials;
+﻿using PatrimonioTech.App.Database;
+using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.App.Credentials.v1.AddUser;
 
 [GenerateAutomaticInterface]
-public class CredentialAddUserUseCase(
+public sealed class CredentialAddUserUseCase(
     IDatabaseAdmin databaseAdmin,
     IUserCredentialRepository userCredentialRepository,
     IAddUserScenario addUserScenario,

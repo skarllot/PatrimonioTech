@@ -5,7 +5,7 @@ using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Infra.Credentials.Services;
 
-public partial class Pbkdf2KeyDerivation : IKeyDerivation
+public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
 {
     private const int BitsPerByte = 8;
     private const int AesMaxKeySize = 256;

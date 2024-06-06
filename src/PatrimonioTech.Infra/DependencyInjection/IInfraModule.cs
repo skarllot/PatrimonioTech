@@ -1,9 +1,10 @@
 ﻿using Jab;
 using LiteDB;
-using PatrimonioTech.App;
+using PatrimonioTech.App.Database;
 using PatrimonioTech.App.SelfApplication;
 using PatrimonioTech.Domain.Credentials.Services;
 using PatrimonioTech.Infra.Credentials.Services;
+using PatrimonioTech.Infra.Database;
 using PatrimonioTech.Infra.SelfApplication;
 using Raiqub.JabModules.MicrosoftExtensionsOptions;
 

@@ -8,7 +8,7 @@ using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Infra.Credentials.Services;
 
-public partial class FileUserCredentialRepository : IUserCredentialRepository
+public sealed partial class FileUserCredentialRepository : IUserCredentialRepository
 {
     private readonly ILogger<FileUserCredentialRepository> _logger;
     private readonly string _appData;
