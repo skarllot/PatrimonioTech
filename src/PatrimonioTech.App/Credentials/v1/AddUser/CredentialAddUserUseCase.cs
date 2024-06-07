@@ -22,8 +22,6 @@ public sealed class CredentialAddUserUseCase(
                 .MapErr(CredentialAddUserError.BusinessError.λ)
                 .ToTask()
             let model = UserCredential.Create(scnRes)
-            from repoRes in userCredentialRepository.Add(model, cancellationToken)
-                .MapErrT(CredentialAddUserError.StorageError.λ)
             from key in keyDerivation
                 .TryGetKey(request.Password, model.Salt, model.Key, model.KeySize, model.Iterations)
                 .MapErr(CredentialAddUserError.CryptographyError.λ)
@@ -31,6 +29,8 @@ public sealed class CredentialAddUserUseCase(
             from db in databaseAdmin.CreateDatabase(model.Database, key)
                 .MapErr(CredentialAddUserError.DatabaseError.λ)
                 .ToTask()
+            from repoRes in userCredentialRepository.Add(model, cancellationToken)
+                .MapErrT(CredentialAddUserError.StorageError.λ)
             select Unit.Default;
     }
 }
