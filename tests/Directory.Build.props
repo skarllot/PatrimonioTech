@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FxKit.Testing" Version="0.7.3" />
+    <PackageReference Include="FxKit.Testing" Version="0.8.0" />
   </ItemGroup>
 
   <ItemGroup>
