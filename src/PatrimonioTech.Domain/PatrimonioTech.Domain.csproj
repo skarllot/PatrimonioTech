@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FxKit" Version="0.8.3" />
-    <PackageReference Include="FxKit.CompilerServices" Version="0.8.3" />
-    <PackageReference Include="Generator.Equals" Version="3.2.0" />
-    <PackageReference Include="Jab.Attributes" Version="0.10.2" />
-    <PackageReference Include="System.Reactive" Version="6.0.1" />
+    <PackageReference Include="FxKit" Version="0.9.0" />
+    <PackageReference Include="FxKit.CompilerServices" Version="0.9.0" />
+    <PackageReference Include="Generator.Equals" Version="3.2.1" />
+    <PackageReference Include="Jab.Attributes" Version="0.12.0" />
+    <PackageReference Include="System.Reactive" Version="6.1.0" />
   </ItemGroup>
 
 </Project>
