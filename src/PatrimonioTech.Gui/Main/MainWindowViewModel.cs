@@ -1,4 +1,4 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables.Fluent;
 using PatrimonioTech.Gui.DependencyInjection;
 using PatrimonioTech.Gui.Login;
 using ReactiveUI;
