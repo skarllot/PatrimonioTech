@@ -7,31 +7,17 @@ namespace PatrimonioTech.Gui.DependencyInjection;
 
 public sealed class ViewLocator : IViewLocator
 {
-    public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract = null) where TViewModel : class
+    private static readonly Dictionary<Type, Func<IViewFor>> s_viewResolvers = new()
     {
-        if (typeof(TViewModel) == typeof(LoginViewModel))
-        {
-            return (IViewFor<TViewModel>)(IViewFor)new LoginView();
-        }
-
-        if (typeof(TViewModel) == typeof(UserCreateViewModel))
-        {
-            return (IViewFor<TViewModel>)(IViewFor)new UserCreateView();
-        }
-
-        if (typeof(TViewModel) == typeof(DashboardViewModel))
-        {
-            return (IViewFor<TViewModel>)(IViewFor)new DashboardView();
-        }
-
-        return null;
-    }
-
-    public IViewFor? ResolveView(object? instance, string? contract = null) => instance switch
-    {
-        LoginViewModel => new LoginView(),
-        UserCreateViewModel => new UserCreateView(),
-        DashboardViewModel => new DashboardView(),
-        _ => null,
+        { typeof(LoginViewModel), static () => new LoginView() },
+        { typeof(UserCreateViewModel), static () => new UserCreateView() },
+        { typeof(DashboardViewModel), static () => new DashboardView() },
     };
+
+    public IViewFor<TViewModel>? ResolveView<TViewModel>(string? contract = null) where TViewModel : class =>
+        s_viewResolvers.GetValueOrDefault(typeof(TViewModel))?.Invoke() as IViewFor<TViewModel>;
+
+    public IViewFor? ResolveView(object? instance, string? contract = null) => instance is not null
+        ? s_viewResolvers.GetValueOrDefault(instance.GetType())?.Invoke()
+        : null;
 }
