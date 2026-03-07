@@ -1,5 +1,5 @@
-using Avalonia.ReactiveUI;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace PatrimonioTech.Gui.Main;
 
