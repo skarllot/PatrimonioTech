@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using PatrimonioTech.App.Credentials.v1.GetUserInfo;
@@ -58,7 +59,8 @@ public sealed partial class LoginViewModel : RoutableViewModelBase
         // USE CASES
         _getAllUserCredentials = () => Observable
             .FromAsync(credentialGetUsersUseCase.Execute)
-            .Select(x => x.UserNames);
+            .Select(x => x.UserNames)
+            .Concat(Observable.Never<ImmutableList<string>>());
 
         _getUserInfo = r => Observable
             .Return(new CredentialGetUserInfoRequest(r.userName, r.password))
@@ -127,6 +129,7 @@ public sealed partial class LoginViewModel : RoutableViewModelBase
             .StartWith(true);
 
         userInfos.Successes()
+            .ObserveOn(SynchronizationContext.Current!)
             .SwitchSelect(_ => HostScreen.Router.Navigate.Execute(_dashboard.Create()))
             .Subscribe(disposable);
 
