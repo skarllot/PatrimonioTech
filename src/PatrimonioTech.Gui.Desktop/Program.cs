@@ -1,8 +1,8 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using PatrimonioTech.Gui.DependencyInjection;
 using PatrimonioTech.Gui.Desktop.DependencyInjection;
+using ReactiveUI.Avalonia;
 
 namespace PatrimonioTech.Gui.Desktop;
 
@@ -34,6 +34,6 @@ public static class Program
         return AppBuilder.Configure(s_container.GetRequiredService<IFactory<App>>().Create)
             .UsePlatformDetect()
             .LogToTrace()
-            .UseReactiveUI();
+            .UseReactiveUI(_ => {});
     }
 }

@@ -1,6 +1,6 @@
-﻿using Avalonia.ReactiveUI;
-using NetArchTest.Rules;
+﻿using NetArchTest.Rules;
 using ReactiveUI;
+using ReactiveUI.Avalonia;
 using static PatrimonioTech.Gui.Desktop.Tests.Architecture.ArchitectureFixture;
 
 namespace PatrimonioTech.Gui.Desktop.Tests.Architecture;
