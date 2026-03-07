@@ -16,7 +16,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Update="FxKit.Testing" Version="0.9.0" />
+    <PackageReference Update="FxKit.Testing" Version="0.9.1" />
   </ItemGroup>
 
   <ItemGroup>
