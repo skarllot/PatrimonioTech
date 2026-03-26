@@ -31,7 +31,17 @@ public class UserGetAvailabilityUseCaseTest
     }
 
     [Fact]
-    public async Task GivenARequest_WhenMatchIsFound_ThenReturnsTrue()
+    public async Task GivenARequest_WhenExactMatchIsFound_ThenReturnsTrue()
+    {
+        // Act
+        var response = await _sut.Execute(new UserGetAvailabilityRequest("Anne"), CancellationToken.None);
+
+        // Assert
+        response.Exists.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GivenARequest_WhenDifferentCaseMatchIsFound_ThenReturnsTrue()
     {
         // Act
         var response = await _sut.Execute(new UserGetAvailabilityRequest("anne"), CancellationToken.None);

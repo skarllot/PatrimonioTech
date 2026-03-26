@@ -16,14 +16,14 @@
   - Verify `NameMinLength` constant equals 3 and is publicly accessible
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 5.1, 5.2_
 
-- [ ] 2. Verify and test App layer use cases
-- [ ] 2.1 (P) Verify UserGetAvailabilityUseCase
+- [x] 2. Verify and test App layer use cases
+- [x] 2.1 (P) Verify UserGetAvailabilityUseCase
   - Confirm the use case loads all credentials and performs case-insensitive locale-aware comparison (`CurrentCultureIgnoreCase`)
   - Verify it returns `Exists = true` for matching usernames regardless of casing and `Exists = false` for unknown names
   - Add or verify unit tests covering: exact match, different-case match, no match
   - _Requirements: 3.1, 3.4_
 
-- [ ] 2.2 (P) Verify CredentialAddUserUseCase orchestration
+- [x] 2.2 (P) Verify CredentialAddUserUseCase orchestration
   - Confirm the pipeline order: domain scenario → key re-derivation → database provisioning → credential persistence
   - Verify that a business error from `AddUserScenario` short-circuits without calling database admin or repository
   - Verify that a database creation error short-circuits without persisting credentials (satisfying the rollback guarantee)
