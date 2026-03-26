@@ -27,7 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.7" />
+    <PackageReference Include="ReactiveUI.Avalonia" Version="11.4.12" />
     <PackageReference Include="ReactiveUI.Validation" Version="7.0.5" />
   </ItemGroup>
 
