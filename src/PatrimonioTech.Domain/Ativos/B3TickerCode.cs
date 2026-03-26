@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel;
+using Raiqub.Generators.EnumUtilities;
 
 namespace PatrimonioTech.Domain.Ativos;
 
+[EnumGenerator]
 public enum B3TickerCode
 {
     [Description("Direito de subscrição a uma ação ordinária")]
@@ -50,5 +52,5 @@ public enum B3TickerCode
     BdrNaoPatrocinadoB = 35,
 
     [Description("BDR de ETF")]
-    BdrEtf = 39
+    BdrEtf = 39,
 }
