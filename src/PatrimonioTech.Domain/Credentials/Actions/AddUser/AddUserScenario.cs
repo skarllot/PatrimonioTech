@@ -6,7 +6,7 @@ namespace PatrimonioTech.Domain.Credentials.Actions.AddUser;
 [GenerateAutomaticInterface]
 public sealed class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScenario
 {
-    private const int NameMinLength = 3;
+    public const int NameMinLength = 3;
     private const int KeySizeMinimum = 128;
     private const int KeySizeMaximum = 4096;
     private const int IterationsMinimum = 1000;
@@ -14,7 +14,7 @@ public sealed class AddUserScenario(IKeyDerivation keyDerivation) : IAddUserScen
 
     public Result<UserCredentialAdded, AddUserCredentialError> Execute(AddUserCredential command)
     {
-        return from name in StringParser.NonNullOrWhiteSpace(command.Name)
+        return from name in StringParser.NonNullOrWhiteSpace(command.Name?.Trim())
                 .Where(v => v.Length >= NameMinLength)
                 .OkOrElse(AddUserCredentialError.NameTooShort.Of)
             from password in Password.Create(command.Password)
