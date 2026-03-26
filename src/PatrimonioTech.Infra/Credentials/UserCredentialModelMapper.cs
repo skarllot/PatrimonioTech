@@ -1,4 +1,4 @@
-﻿using PatrimonioTech.Domain.Credentials;
+using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using Riok.Mapperly.Abstractions;
 

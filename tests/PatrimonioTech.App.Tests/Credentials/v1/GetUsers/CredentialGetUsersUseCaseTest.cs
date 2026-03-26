@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using JetBrains.Annotations;
 using NSubstitute;
 using PatrimonioTech.App.Credentials.v1.GetUsers;
@@ -27,9 +27,9 @@ public class CredentialGetUsersUseCaseTest
             .GetAll(CancellationToken.None)
             .Returns(
             [
-                UserCredential.Create(new UserCredentialAdded("John", "123", "password", Guid.Empty, 1, 1)),
-                UserCredential.Create(new UserCredentialAdded("Carl", "456", "password", Guid.Empty, 2, 1)),
-                UserCredential.Create(new UserCredentialAdded("Anne", "789", "password", Guid.Empty, 3, 1)),
+                UserCredential.Create(new UserCredentialAdded("John", "$pbkdf2-sha512$i=100000,l=512$salt1$key1", Guid.Empty)),
+                UserCredential.Create(new UserCredentialAdded("Carl", "$pbkdf2-sha512$i=100000,l=512$salt2$key2", Guid.Empty)),
+                UserCredential.Create(new UserCredentialAdded("Anne", "$pbkdf2-sha512$i=100000,l=512$salt3$key3", Guid.Empty)),
             ]);
 
         // Act

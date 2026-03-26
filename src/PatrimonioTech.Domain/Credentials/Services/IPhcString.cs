@@ -1,6 +1,6 @@
 namespace PatrimonioTech.Domain.Credentials.Services;
 
-public enum GetKeyError
+public interface IPhcString
 {
-    InvalidPassword = 1,
+    string Value { get; }
 }

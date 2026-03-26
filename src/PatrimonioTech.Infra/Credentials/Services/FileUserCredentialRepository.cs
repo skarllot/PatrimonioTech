@@ -96,16 +96,34 @@ public sealed partial class FileUserCredentialRepository : IUserCredentialReposi
 
     private async Task Write(List<UserCredentialModel> data, CancellationToken cancellationToken)
     {
-        var fileStream = new FileStream(_configFile, FileMode.Create, FileAccess.Write);
-        await using (fileStream.ConfigureAwait(false))
+        var tempFile = Path.Combine(_appData, $"{Path.GetRandomFileName()}.tmp");
+        try
         {
-            await JsonSerializer
-                .SerializeAsync(fileStream, data, _jsonOptions, cancellationToken)
-                .ConfigureAwait(false);
+            var fileStream = new FileStream(tempFile, FileMode.Create, FileAccess.Write);
+            await using (fileStream.ConfigureAwait(false))
+            {
+                await JsonSerializer
+                    .SerializeAsync(fileStream, data, _jsonOptions, cancellationToken)
+                    .ConfigureAwait(false);
 
-            await fileStream
-                .FlushAsync(cancellationToken)
-                .ConfigureAwait(false);
+                await fileStream
+                    .FlushAsync(cancellationToken)
+                    .ConfigureAwait(false);
+            }
+
+            if (File.Exists(_configFile))
+            {
+                File.Replace(tempFile, _configFile, destinationBackupFileName: null);
+            }
+            else
+            {
+                File.Move(tempFile, _configFile);
+            }
+        }
+        catch when (File.Exists(tempFile))
+        {
+            File.Delete(tempFile);
+            throw;
         }
     }
 

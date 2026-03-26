@@ -1,4 +1,5 @@
-﻿using FxKit.CompilerServices;
+using FxKit.CompilerServices;
+using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.Domain.Credentials.Actions.AddUser;
 
@@ -9,11 +10,5 @@ public partial record AddUserCredentialError
 
     partial record NameTooShort;
 
-    partial record KeySizeTooLow;
-
-    partial record KeySizeTooHigh;
-
-    partial record IterationsTooLow;
-
-    partial record IterationsTooHigh;
+    partial record KeyDerivationFailed(CryptographyError Error);
 }

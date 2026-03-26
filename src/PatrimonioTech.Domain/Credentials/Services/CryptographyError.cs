@@ -1,6 +1,6 @@
 namespace PatrimonioTech.Domain.Credentials.Services;
 
-public enum GetKeyError
+public enum CryptographyError
 {
-    InvalidPassword = 1,
+    Failed = 1,
 }
