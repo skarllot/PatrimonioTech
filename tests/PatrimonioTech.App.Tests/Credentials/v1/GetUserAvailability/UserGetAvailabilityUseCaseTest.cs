@@ -52,8 +52,8 @@ public class UserGetAvailabilityUseCaseTest
 
     private static IReadOnlyList<UserCredential> CredentialsFixture =>
     [
-        UserCredential.Create(new UserCredentialAdded("John", "$pbkdf2-sha512$i=100000,l=512$salt1$key1", Guid.Empty)),
-        UserCredential.Create(new UserCredentialAdded("Carl", "$pbkdf2-sha512$i=100000,l=512$salt2$key2", Guid.Empty)),
-        UserCredential.Create(new UserCredentialAdded("Anne", "$pbkdf2-sha512$i=100000,l=512$salt3$key3", Guid.Empty)),
+        UserCredential.Create(new UserCredentialAdded("John", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt1$key1", Guid.Empty)),
+        UserCredential.Create(new UserCredentialAdded("Carl", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt2$key2", Guid.Empty)),
+        UserCredential.Create(new UserCredentialAdded("Anne", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt3$key3", Guid.Empty)),
     ];
 }

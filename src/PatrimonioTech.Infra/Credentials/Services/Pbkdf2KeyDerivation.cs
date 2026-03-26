@@ -23,36 +23,44 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
 
     public Result<IPhcString, CryptographyError> CreateKey(Password password)
     {
+        var keyLengthBytes = DefaultKeyLengthBits / BitsPerByte;
+
+        Span<byte> binarySalt = stackalloc byte[keyLengthBytes];
+        RandomNumberGenerator.Fill(binarySalt);
+
+        Span<byte> binaryKey = stackalloc byte[keyLengthBytes];
+        RandomNumberGenerator.Fill(binaryKey);
+
+        var binaryHash = new byte[AesMaxKeySize / BitsPerByte];
         try
         {
-            var keyLengthBytes = DefaultKeyLengthBits / BitsPerByte;
-
-            Span<byte> binarySalt = stackalloc byte[keyLengthBytes];
-            RandomNumberGenerator.Fill(binarySalt);
-
-            Span<byte> binaryKey = stackalloc byte[keyLengthBytes];
-            RandomNumberGenerator.Fill(binaryKey);
-
-            var binaryHash = new byte[AesMaxKeySize / BitsPerByte];
             Rfc2898DeriveBytes.Pbkdf2(password.Value, binarySalt, binaryHash, DefaultIterations, s_hashAlgorithmName);
-
-            Span<byte> encrypted = stackalloc byte[DefaultKeyLengthBits];
-
-            using var aes = Aes.Create();
-            aes.Key = binaryHash;
-            var writtenBytes = aes.EncryptCbc(binaryKey, binarySalt[..(AesMaxIvSize / BitsPerByte)], encrypted);
-
-            return Pbkdf2PhcString.Create(
-                salt: Convert.ToBase64String(binarySalt),
-                encryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]),
-                iterations: DefaultIterations,
-                keyLengthBits: DefaultKeyLengthBits);
         }
         catch (CryptographicException e)
         {
             LogCryptographicException(e);
-            return CryptographyError.Failed;
+            return CryptographyError.KeyDerivationFailed;
         }
+
+        Span<byte> encrypted = stackalloc byte[DefaultKeyLengthBits];
+        int writtenBytes;
+        try
+        {
+            using var aes = Aes.Create();
+            aes.Key = binaryHash;
+            writtenBytes = aes.EncryptCbc(binaryKey, binarySalt[..(AesMaxIvSize / BitsPerByte)], encrypted);
+        }
+        catch (CryptographicException e)
+        {
+            LogCryptographicException(e);
+            return CryptographyError.EncryptionFailed;
+        }
+
+        return Pbkdf2PhcString.Create(
+            salt: Convert.ToBase64String(binarySalt),
+            encryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]),
+            iterations: DefaultIterations,
+            keyLengthBits: DefaultKeyLengthBits);
     }
 
     public Result<string, GetKeyError> TryGetKey(string password, string passwordHash)
@@ -109,6 +117,6 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
         }
     }
 
-    [LoggerMessage(LogLevel.Error, "Error decrypting CBC")]
+    [LoggerMessage(LogLevel.Error, "Error during cryptographic operation")]
     private partial void LogCryptographicException(CryptographicException exception);
 }

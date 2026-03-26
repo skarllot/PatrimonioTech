@@ -19,7 +19,7 @@ public class CredentialAddUserUseCaseTest
     private readonly CredentialAddUserUseCase _sut;
 
     private static readonly UserCredentialAdded ValidAdded =
-        new("john", "$pbkdf2-sha512$i=100000,l=512$salt$key", Guid.Empty);
+        new("john", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key", Guid.Empty);
 
     public CredentialAddUserUseCaseTest()
     {

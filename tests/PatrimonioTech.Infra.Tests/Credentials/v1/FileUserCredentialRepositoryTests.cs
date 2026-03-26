@@ -99,7 +99,7 @@ public sealed class FileUserCredentialRepositoryTests : IDisposable
 
     private static UserCredential MakeCredential(string name) =>
         UserCredential.Create(
-            new UserCredentialAdded(name, "$pbkdf2-sha512$i=100000,l=512$salt$key", Guid.NewGuid()));
+            new UserCredentialAdded(name, "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key", Guid.NewGuid()));
 
     private sealed class TestLocalPathProvider(string appData) : ILocalPathProvider
     {

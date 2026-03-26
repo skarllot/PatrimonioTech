@@ -113,7 +113,7 @@ public sealed partial class FileUserCredentialRepository : IUserCredentialReposi
 
             if (File.Exists(_configFile))
             {
-                File.Replace(tempFile, _configFile, destinationBackupFileName: null);
+                File.Replace(tempFile, _configFile, destinationBackupFileName: _configFile + ".bak");
             }
             else
             {

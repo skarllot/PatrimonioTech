@@ -19,7 +19,7 @@ public class AddUserScenarioTests
     {
         _keyDerivation
             .CreateKey(Arg.Any<Password>())
-            .Returns(new TestPhcString("$pbkdf2-sha512$i=100000,l=512$salt$key"));
+            .Returns(new TestPhcString("$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key"));
         _sut = new AddUserScenario(_keyDerivation);
     }
 
@@ -95,7 +95,7 @@ public class AddUserScenarioTests
     [Fact]
     public void Execute_WithKeyDerivationFailure_ReturnsKeyDerivationFailed()
     {
-        _keyDerivation.CreateKey(Arg.Any<Password>()).Returns(CryptographyError.Failed);
+        _keyDerivation.CreateKey(Arg.Any<Password>()).Returns(CryptographyError.KeyDerivationFailed);
 
         var result = _sut.Execute(ValidCommand);
 
@@ -118,7 +118,7 @@ public class AddUserScenarioTests
 
         var added = result.Should().BeOk();
         added.Name.Should().Be(ValidCommand.Name);
-        added.PasswordHash.Should().Be("$pbkdf2-sha512$i=100000,l=512$salt$key");
+        added.PasswordHash.Should().Be("$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key");
         added.Database.Should().NotBe(Guid.Empty);
     }
 

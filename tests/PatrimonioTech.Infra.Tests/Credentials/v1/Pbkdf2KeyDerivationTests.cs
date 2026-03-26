@@ -21,7 +21,7 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
         var result = _keyDerivation.CreateKey(p);
 
         var phcString = result.Should().BeOk();
-        phcString.Value.Should().StartWith("$pbkdf2-sha512$");
+        phcString.Value.Should().StartWith("$pbkdf2-sha512-aes256cbc$");
 
         outputHelper.WriteLine("PHC: {0}", phcString.Value);
     }
@@ -61,10 +61,10 @@ public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
     }
 
     [Fact]
-    public void TryGetKey_WithMalformedPhcString_ReturnsInvalidPassword()
+    public void TryGetKey_WithMalformedPhcString_ReturnsInvalidHash()
     {
         var result = _keyDerivation.TryGetKey("password", "not-a-valid-phc-string");
 
-        result.Should().BeErr().Should().Be(GetKeyError.InvalidPassword);
+        result.Should().BeErr().Should().Be(GetKeyError.InvalidHash);
     }
 }
