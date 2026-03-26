@@ -1,6 +1,7 @@
 ---
 description: Manage .sdd/steering/ as persistent project knowledge
 allowed-tools: Bash, Read, Write, Edit, MultiEdit, Glob, Grep, LS
+model: sonnet
 ---
 
 # Kiro Steering Management
