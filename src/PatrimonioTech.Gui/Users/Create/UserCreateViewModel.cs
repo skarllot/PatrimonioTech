@@ -1,9 +1,10 @@
-﻿using System.Reactive.Disposables;
+using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using PatrimonioTech.App.Credentials.v1.AddUser;
 using PatrimonioTech.App.Credentials.v1.GetUserAvailability;
+using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Gui.Common;
 using PropertyChanged.SourceGenerator;
 using ReactiveUI;
@@ -20,13 +21,20 @@ public sealed partial class UserCreateViewModel : RoutableViewModelBase
 
     // Intermediate Streams
     private readonly Subject<bool> _canCreateSubject = new();
+    private readonly ObservableAsPropertyHelper<bool> _isCreating;
 
     // Use Cases
-    private Func<string, IObservable<UserGetAvailabilityResponse>> _getUserAvailability;
+    private readonly IUserGetAvailabilityUseCase _getUserAvailabilityUseCase;
 
     // Commands
     public ReactiveCommand<Unit, IRoutableViewModel> Cancel { get; }
     public ReactiveCommand<Unit, Result<Unit, CredentialAddUserError>> Create { get; }
+
+    // Interactions
+    public Interaction<string, Unit> ShowError { get; } = new();
+
+    // Bindable Properties
+    public bool IsCreating => _isCreating.Value;
 
     public UserCreateViewModel(
         IScreen hostScreen,
@@ -35,23 +43,20 @@ public sealed partial class UserCreateViewModel : RoutableViewModelBase
         : base(hostScreen)
     {
         // USE CASES
-        _getUserAvailability = userName => Observable
-            .Return(new UserGetAvailabilityRequest(userName))
-            .SelectMany(getUserAvailabilityUseCase.Execute);
-
-        var addUser = ((string UserName, string Password) r) => Observable
-            .Return(new CredentialAddUserRequest(r.UserName, r.Password))
-            .SelectMany(addUserUseCase.Execute);
+        _getUserAvailabilityUseCase = getUserAvailabilityUseCase;
 
         // CANCEL COMMAND
         Cancel = ReactiveCommand.CreateFromObservable(() => hostScreen.Router.NavigateBack.Execute());
 
         // CREATE COMMAND
         Create = ReactiveCommand.CreateFromObservable(
-            (Unit _) => addUser((UserName, Password)),
+            (Unit _) => Observable
+                .Return(new CredentialAddUserRequest(UserName, Password))
+                .SelectMany(addUserUseCase.Execute),
             _canCreateSubject);
 
-        // VALIDATIONS
+        _isCreating = Create.IsExecuting.ToProperty(this, vm => vm.IsCreating);
+
         this.WhenActivated(OnViewActivated);
     }
 
@@ -60,6 +65,7 @@ public sealed partial class UserCreateViewModel : RoutableViewModelBase
         if (disposing)
         {
             _canCreateSubject.Dispose();
+            _isCreating.Dispose();
         }
 
         base.Dispose(disposing);
@@ -73,8 +79,12 @@ public sealed partial class UserCreateViewModel : RoutableViewModelBase
         var isUserValid = whenUserNameChanged
             .Select(v => !v.AsSpan().Trim().IsWhiteSpace());
 
+        var isUserLongEnough = whenUserNameChanged
+            .Select(v => v.Trim().Length >= AddUserScenario.NameMinLength);
+
         var isUserAvailable = whenUserNameChanged
-            .SelectMany(_getUserAvailability)
+            .Select(name => Observable.FromAsync(ct => _getUserAvailabilityUseCase.Execute(new UserGetAvailabilityRequest(name), ct)))
+            .Switch()
             .Select(r => !r.Exists);
 
         // PASSWORD INPUT
@@ -94,21 +104,44 @@ public sealed partial class UserCreateViewModel : RoutableViewModelBase
         Observable
             .CombineLatest(
                 isUserValid,
+                isUserLongEnough,
                 isPasswordValid,
                 isConfirmationMatch,
                 isUserAvailable,
-                (v1, v2, v3, v4) => v1 && v2 && v3 && v4)
+                (v1, v2, v3, v4, v5) => v1 && v2 && v3 && v4 && v5)
             .DistinctUntilChanged()
             .Subscribe(_canCreateSubject, disposable);
 
+        // NAVIGATION
+        Create.Successes()
+            .SelectMany(_ => HostScreen.Router.NavigateBack.Execute())
+            .Subscribe(disposable);
+
+        // ERROR HANDLING
+        Create.Failures()
+            .Select(MapErrorToMessage)
+            .SelectMany(msg => ShowError.Handle(msg))
+            .Subscribe(disposable);
+
         // VALIDATIONS
         this.ValidationRule(vm => vm.UserName, isUserAvailable, "Usuário já existe").DisposeWith(disposable);
+        this.ValidationRule(vm => vm.UserName, isUserLongEnough, "Nome muito curto").DisposeWith(disposable);
         this.ValidationRule(vm => vm.Password, isPasswordValid, "Senha muito curta").DisposeWith(disposable);
-
         this.ValidationRule(vm => vm.PasswordConfirmation, isConfirmationMatch, "As senhas não coincidem")
             .DisposeWith(disposable);
-
-        Create.SelectMany(_ => HostScreen.Router.NavigateBack.Execute())
-            .Subscribe(disposable);
     }
+
+    private static string MapErrorToMessage(CredentialAddUserError error) =>
+        error switch
+        {
+            CredentialAddUserError.BusinessError { Error: AddUserCredentialError.KeyDerivationFailed }
+                => "Falha na proteção dos dados. Tente novamente.",
+            CredentialAddUserError.BusinessError
+                => "Dados inválidos. Verifique os campos e tente novamente.",
+            CredentialAddUserError.StorageError
+                => "O nome de usuário já foi registrado. Escolha outro nome.",
+            CredentialAddUserError.DatabaseError
+                => "Não foi possível criar o banco de dados. Verifique o espaço em disco e tente novamente.",
+            _ => "Falha na proteção dos dados. Tente novamente."
+        };
 }
