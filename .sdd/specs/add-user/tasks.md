@@ -54,14 +54,14 @@
   - Add or verify an integration test for database creation
   - _Requirements: 6.1, 6.2_
 
-- [ ] 4. Verify and test GUI layer registration form
-- [ ] 4.1 Verify UserCreateView form layout
+- [x] 4. Verify and test GUI layer registration form
+- [x] 4.1 Verify UserCreateView form layout
   - Confirm the view contains input fields for username, password, and password confirmation
   - Confirm the view has a Create button (labeled "Criar") and a Cancel button (labeled "Cancelar")
   - Confirm inputs are disabled and a spinner is shown inside the Create button while `IsCreating` is true
   - _Requirements: 1.1, 1.2_
 
-- [ ] 4.2 Verify UserCreateViewModel validation rules and commands
+- [x] 4.2 Verify UserCreateViewModel validation rules and commands
   - Confirm five validation streams exist: `isUserValid` (non-whitespace), `isUserLongEnough` (trimmed ≥ 3), `isPasswordValid` (≥ 8 chars), `isConfirmationMatch` (ordinal equality), `isUserAvailable` (async check)
   - Confirm `CombineLatest` with `DistinctUntilChanged` drives the `_canCreateSubject` that gates the Create command
   - Confirm Create is disabled until first availability response arrives (no initial value on `_canCreateSubject`)
@@ -72,7 +72,7 @@
   - Verify `isUserAvailable` uses `Switch()` to cancel in-flight availability requests
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 2.5, 3.1, 3.2, 3.3_
 
-- [ ] 4.3 Add UserCreateViewModel unit tests
+- [x] 4.3 Add UserCreateViewModel unit tests
   - Set up test infrastructure with mocked use cases and a test `IScreen` router
   - Test: empty/whitespace username → Create disabled
   - Test: username with fewer than 3 characters → "Nome muito curto" validation message and Create disabled
