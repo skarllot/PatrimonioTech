@@ -7,7 +7,7 @@ namespace PatrimonioTech.Infra.Credentials.Services;
 /// A PHC-format string encoding PBKDF2-SHA512 parameters and an AES-256-CBC encrypted database key.
 /// Format: $pbkdf2-sha512-aes256cbc$i={iterations},l={keyLengthBits}${saltBase64}${encryptedKeyBase64}
 /// </summary>
-internal sealed class Pbkdf2PhcString : IPhcString
+public sealed class Pbkdf2PhcString : IPhcString
 {
     private const string AlgorithmId = "pbkdf2-sha512-aes256cbc";
 

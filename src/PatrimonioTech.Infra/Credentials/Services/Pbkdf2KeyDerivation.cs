@@ -15,10 +15,12 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
     private static readonly HashAlgorithmName s_hashAlgorithmName = HashAlgorithmName.SHA512;
 
     private readonly ILogger<Pbkdf2KeyDerivation> _logger;
+    private readonly IPbkdf2PhcStringParser _phcStringParser;
 
-    public Pbkdf2KeyDerivation(ILogger<Pbkdf2KeyDerivation> logger)
+    public Pbkdf2KeyDerivation(ILogger<Pbkdf2KeyDerivation> logger, IPbkdf2PhcStringParser phcStringParser)
     {
         _logger = logger;
+        _phcStringParser = phcStringParser;
     }
 
     public Result<IPhcString, CryptographyError> CreateKey(Password password)
@@ -56,7 +58,7 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
             return CryptographyError.EncryptionFailed;
         }
 
-        return Pbkdf2PhcString.Create(
+        return _phcStringParser.Create(
             salt: Convert.ToBase64String(binarySalt),
             encryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]),
             iterations: DefaultIterations,
@@ -65,7 +67,7 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
 
     public Result<string, GetKeyError> TryGetKey(string password, string passwordHash)
     {
-        return from phcString in Pbkdf2PhcString.Parse(passwordHash)
+        return from phcString in _phcStringParser.Parse(passwordHash)
                from key in DecryptKey(password, phcString)
                select key;
     }
@@ -83,7 +85,15 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
             return GetKeyError.InvalidPassword;
 
         var binaryHash = new byte[AesMaxKeySize / BitsPerByte];
-        Rfc2898DeriveBytes.Pbkdf2(password, binarySalt, binaryHash, phcString.Iterations, s_hashAlgorithmName);
+        try
+        {
+            Rfc2898DeriveBytes.Pbkdf2(password, binarySalt, binaryHash, phcString.Iterations, s_hashAlgorithmName);
+        }
+        catch (CryptographicException e)
+        {
+            LogCryptographicException(e);
+            return GetKeyError.InvalidPassword;
+        }
 
         Span<byte> binaryKey = stackalloc byte[keyLengthBytes];
 

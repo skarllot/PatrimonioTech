@@ -9,7 +9,7 @@ namespace PatrimonioTech.Infra.Tests.Credentials.v1;
 
 public class Pbkdf2KeyDerivationTests(ITestOutputHelper outputHelper)
 {
-    private readonly Pbkdf2KeyDerivation _keyDerivation = new(NullLogger<Pbkdf2KeyDerivation>.Instance);
+    private readonly Pbkdf2KeyDerivation _keyDerivation = new(NullLogger<Pbkdf2KeyDerivation>.Instance, new Pbkdf2PhcStringParser());
 
     [Theory]
     [InlineData("password")]
