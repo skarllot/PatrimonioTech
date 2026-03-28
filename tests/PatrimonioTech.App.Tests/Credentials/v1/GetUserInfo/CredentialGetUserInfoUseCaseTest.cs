@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using JetBrains.Annotations;
 using NSubstitute;
 using PatrimonioTech.App.Credentials.v1.GetUserInfo;
@@ -29,7 +29,7 @@ public class CredentialGetUserInfoUseCaseTest
     {
         // Arrange
         _keyDerivation
-            .TryGetKey("password", Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>())
+            .TryGetKey("password", Arg.Any<string>())
             .Returns("secret");
 
         // Act
@@ -54,7 +54,7 @@ public class CredentialGetUserInfoUseCaseTest
     {
         // Arrange
         _keyDerivation
-            .TryGetKey("password", Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>())
+            .TryGetKey("password", Arg.Any<string>())
             .Returns(GetKeyError.InvalidPassword);
 
         // Act
@@ -66,8 +66,8 @@ public class CredentialGetUserInfoUseCaseTest
 
     private static IReadOnlyList<UserCredential> CredentialsFixture =>
     [
-        UserCredential.Create(new UserCredentialAdded("John", "123", "password", Guid.Empty, 1, 1)),
-        UserCredential.Create(new UserCredentialAdded("Carl", "456", "password", Guid.Empty, 2, 1)),
-        UserCredential.Create(new UserCredentialAdded("Anne", "789", "password", Guid.Empty, 3, 1)),
+        UserCredential.Create(new UserCredentialAdded("John", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt1$key1", Guid.Empty)),
+        UserCredential.Create(new UserCredentialAdded("Carl", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt2$key2", Guid.Empty)),
+        UserCredential.Create(new UserCredentialAdded("Anne", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt3$key3", Guid.Empty)),
     ];
 }

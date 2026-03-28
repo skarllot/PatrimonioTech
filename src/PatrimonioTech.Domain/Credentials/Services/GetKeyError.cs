@@ -1,8 +1,7 @@
-﻿namespace PatrimonioTech.Domain.Credentials.Services;
+namespace PatrimonioTech.Domain.Credentials.Services;
 
 public enum GetKeyError
 {
-    InvalidSalt = 1,
-    InvalidEncryptedKey,
-    InvalidPassword,
+    InvalidPassword = 1,
+    InvalidHash = 2,
 }

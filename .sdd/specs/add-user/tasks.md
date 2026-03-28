@@ -32,8 +32,8 @@
   - Add or verify unit tests for each short-circuit path and the success path
   - _Requirements: 5.1, 5.2, 6.1, 6.2, 7.1, 7.2_
 
-- [ ] 3. Verify Infra layer implementations
-- [ ] 3.1 (P) Verify Pbkdf2KeyDerivation and PhcString round-trip
+- [x] 3. Verify Infra layer implementations
+- [x] 3.1 (P) Verify Pbkdf2KeyDerivation and PhcString round-trip
   - Confirm `CreateKey` generates a valid `IPhcString` and returns `Ok`
   - Confirm `TryGetKey` with the correct password and hash returns the database key successfully
   - Confirm `TryGetKey` with an incorrect password returns an error
@@ -41,14 +41,14 @@
   - Add or verify integration tests for the full round-trip
   - _Requirements: 5.1, 5.2_
 
-- [ ] 3.2 (P) Verify FileUserCredentialRepository
+- [x] 3.2 (P) Verify FileUserCredentialRepository
   - Confirm `Add` persists a credential to the JSON file and can be retrieved via `GetAll`
   - Confirm `Add` with a duplicate name (case-insensitive) returns `NameAlreadyExists`
   - Verify atomic write strategy (temp file + `File.Replace`) is implemented
   - Add or verify integration tests for first add, duplicate add, and round-trip read
   - _Requirements: 7.1, 7.2_
 
-- [ ] 3.3 (P) Verify LiteDbDatabaseAdmin
+- [x] 3.3 (P) Verify LiteDbDatabaseAdmin
   - Confirm `CreateDatabase` creates an encrypted LiteDB file at the path derived from the database GUID
   - Confirm the database is accessible with the provided key
   - Add or verify an integration test for database creation

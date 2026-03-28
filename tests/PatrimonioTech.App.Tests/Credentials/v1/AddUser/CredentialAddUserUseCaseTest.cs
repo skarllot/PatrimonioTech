@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using JetBrains.Annotations;
 using NSubstitute;
 using PatrimonioTech.App.Credentials.v1.AddUser;
@@ -18,6 +18,9 @@ public class CredentialAddUserUseCaseTest
     private readonly IKeyDerivation _keyDerivation = Substitute.For<IKeyDerivation>();
     private readonly CredentialAddUserUseCase _sut;
 
+    private static readonly UserCredentialAdded ValidAdded =
+        new("john", "$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key", Guid.Empty);
+
     public CredentialAddUserUseCaseTest()
     {
         _sut = new CredentialAddUserUseCase(
@@ -33,12 +36,12 @@ public class CredentialAddUserUseCaseTest
         // Arrange
         _addUserScenario
             .Execute(Arg.Any<AddUserCredential>())
-            .Returns(new UserCredentialAdded("john", "123", "password", Guid.Empty, 1, 1));
+            .Returns(ValidAdded);
         _userCredentialRepository
             .Add(Arg.Any<UserCredential>(), CancellationToken.None)
             .Returns(Unit.Default);
         _keyDerivation
-            .TryGetKey(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>())
+            .TryGetKey(Arg.Any<string>(), Arg.Any<string>())
             .Returns("password");
         _databaseAdmin
             .CreateDatabase(Guid.Empty, Arg.Any<string>())
@@ -75,12 +78,12 @@ public class CredentialAddUserUseCaseTest
         // Arrange
         _addUserScenario
             .Execute(Arg.Any<AddUserCredential>())
-            .Returns(new UserCredentialAdded("john", "123", "password", Guid.Empty, 1, 1));
+            .Returns(ValidAdded);
         _userCredentialRepository
             .Add(Arg.Any<UserCredential>(), CancellationToken.None)
             .Returns(Unit.Default);
         _keyDerivation
-            .TryGetKey(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>())
+            .TryGetKey(Arg.Any<string>(), Arg.Any<string>())
             .Returns(GetKeyError.InvalidPassword);
 
         // Act
@@ -98,9 +101,9 @@ public class CredentialAddUserUseCaseTest
         // Arrange
         _addUserScenario
             .Execute(Arg.Any<AddUserCredential>())
-            .Returns(new UserCredentialAdded("john", "123", "password", Guid.Empty, 1, 1));
+            .Returns(ValidAdded);
         _keyDerivation
-            .TryGetKey(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>())
+            .TryGetKey(Arg.Any<string>(), Arg.Any<string>())
             .Returns("password");
         _databaseAdmin
             .CreateDatabase(Guid.Empty, Arg.Any<string>())
@@ -120,9 +123,9 @@ public class CredentialAddUserUseCaseTest
         // Arrange
         _addUserScenario
             .Execute(Arg.Any<AddUserCredential>())
-            .Returns(new UserCredentialAdded("john", "123", "password", Guid.Empty, 1, 1));
+            .Returns(ValidAdded);
         _keyDerivation
-            .TryGetKey(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<int>())
+            .TryGetKey(Arg.Any<string>(), Arg.Any<string>())
             .Returns("password");
         _databaseAdmin
             .CreateDatabase(Guid.Empty, Arg.Any<string>())

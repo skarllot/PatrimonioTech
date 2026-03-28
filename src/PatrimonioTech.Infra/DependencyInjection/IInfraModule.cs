@@ -13,6 +13,7 @@ namespace PatrimonioTech.Infra.DependencyInjection;
 [ServiceProviderModule]
 [Import(typeof(IOptionsModule))]
 [Import(typeof(ILoggingModule))]
+[Singleton(typeof(IPbkdf2PhcStringParser), typeof(Pbkdf2PhcStringParser))]
 [Singleton(typeof(IKeyDerivation), typeof(Pbkdf2KeyDerivation))]
 [Scoped(typeof(IUserCredentialRepository), typeof(FileUserCredentialRepository))]
 [Singleton(typeof(IDatabaseAdmin), typeof(LiteDbDatabaseAdmin))]

@@ -10,11 +10,7 @@ namespace PatrimonioTech.Domain.Tests.Credentials.Actions.AddUser;
 [TestSubject(typeof(AddUserScenario))]
 public class AddUserScenarioTests
 {
-    private static readonly AddUserCredential ValidCommand = new(
-        "ValidUser",
-        "password1",
-        UserCredential.DefaultKeySize,
-        UserCredential.DefaultIterations);
+    private static readonly AddUserCredential ValidCommand = new("ValidUser", "password1");
 
     private readonly IKeyDerivation _keyDerivation = Substitute.For<IKeyDerivation>();
     private readonly AddUserScenario _sut;
@@ -22,8 +18,8 @@ public class AddUserScenarioTests
     public AddUserScenarioTests()
     {
         _keyDerivation
-            .CreateKey(Arg.Any<Password>(), Arg.Any<int>(), Arg.Any<int>())
-            .Returns(new CreateKeyResult("salt123", "encryptedKey456"));
+            .CreateKey(Arg.Any<Password>())
+            .Returns(new TestPhcString("$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key"));
         _sut = new AddUserScenario(_keyDerivation);
     }
 
@@ -97,12 +93,22 @@ public class AddUserScenarioTests
     }
 
     [Fact]
+    public void Execute_WithKeyDerivationFailure_ReturnsKeyDerivationFailed()
+    {
+        _keyDerivation.CreateKey(Arg.Any<Password>()).Returns(CryptographyError.KeyDerivationFailed);
+
+        var result = _sut.Execute(ValidCommand);
+
+        result.Should().BeErr().Should().BeOfType<AddUserCredentialError.KeyDerivationFailed>();
+    }
+
+    [Fact]
     public void Execute_WithValidInputs_CallsKeyDerivationAndReturnsOk()
     {
         var result = _sut.Execute(ValidCommand);
 
         result.Should().BeOk();
-        _keyDerivation.Received(1).CreateKey(Arg.Any<Password>(), Arg.Any<int>(), Arg.Any<int>());
+        _keyDerivation.Received(1).CreateKey(Arg.Any<Password>());
     }
 
     [Fact]
@@ -112,8 +118,9 @@ public class AddUserScenarioTests
 
         var added = result.Should().BeOk();
         added.Name.Should().Be(ValidCommand.Name);
-        added.Salt.Should().Be("salt123");
-        added.Key.Should().Be("encryptedKey456");
+        added.PasswordHash.Should().Be("$pbkdf2-sha512-aes256cbc$i=100000,l=512$salt$key");
         added.Database.Should().NotBe(Guid.Empty);
     }
+
+    private sealed record TestPhcString(string Value) : IPhcString;
 }

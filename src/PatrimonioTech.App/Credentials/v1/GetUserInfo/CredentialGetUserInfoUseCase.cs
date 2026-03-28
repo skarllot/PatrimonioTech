@@ -1,4 +1,4 @@
-﻿using FxKit.Extensions;
+using FxKit.Extensions;
 using PatrimonioTech.Domain.Credentials.Services;
 
 namespace PatrimonioTech.App.Credentials.v1.GetUserInfo;
@@ -21,12 +21,7 @@ public sealed class CredentialGetUserInfoUseCase(
                 .OkOrElse(CredentialGetUserInfoError.UserNotFound.Of)
                 .ToTask()
             from password in keyDerivation
-                .TryGetKey(
-                    password: request.Password,
-                    salt: foundUser.Salt,
-                    encryptedKey: foundUser.Key,
-                    keySize: foundUser.KeySize,
-                    iterations: foundUser.Iterations)
+                .TryGetKey(request.Password, foundUser.PasswordHash)
                 .MapErr(CredentialGetUserInfoError.CryptographyError.Of)
                 .ToTask()
             select new CredentialGetUserInfoResponse(

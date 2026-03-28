@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Services;
@@ -8,62 +8,94 @@ namespace PatrimonioTech.Infra.Credentials.Services;
 public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
 {
     private const int BitsPerByte = 8;
+    private const int DefaultKeyLengthBits = 512;
+    private const int DefaultIterations = 100_000;
     private const int AesMaxKeySize = 256;
     private const int AesMaxIvSize = 128;
     private static readonly HashAlgorithmName s_hashAlgorithmName = HashAlgorithmName.SHA512;
 
     private readonly ILogger<Pbkdf2KeyDerivation> _logger;
+    private readonly IPbkdf2PhcStringParser _phcStringParser;
 
-    public Pbkdf2KeyDerivation(ILogger<Pbkdf2KeyDerivation> logger)
+    public Pbkdf2KeyDerivation(ILogger<Pbkdf2KeyDerivation> logger, IPbkdf2PhcStringParser phcStringParser)
     {
         _logger = logger;
+        _phcStringParser = phcStringParser;
     }
 
-    public CreateKeyResult CreateKey(Password password, int keySize, int iterations)
+    public Result<IPhcString, CryptographyError> CreateKey(Password password)
     {
-        Span<byte> binarySalt = stackalloc byte[keySize / BitsPerByte];
+        var keyLengthBytes = DefaultKeyLengthBits / BitsPerByte;
+
+        Span<byte> binarySalt = stackalloc byte[keyLengthBytes];
         RandomNumberGenerator.Fill(binarySalt);
 
-        Span<byte> binaryKey = stackalloc byte[keySize / BitsPerByte];
+        Span<byte> binaryKey = stackalloc byte[keyLengthBytes];
         RandomNumberGenerator.Fill(binaryKey);
 
         var binaryHash = new byte[AesMaxKeySize / BitsPerByte];
-        Rfc2898DeriveBytes.Pbkdf2(password.Value, binarySalt, binaryHash, iterations, s_hashAlgorithmName);
+        try
+        {
+            Rfc2898DeriveBytes.Pbkdf2(password.Value, binarySalt, binaryHash, DefaultIterations, s_hashAlgorithmName);
+        }
+        catch (CryptographicException e)
+        {
+            LogCryptographicException(e);
+            return CryptographyError.KeyDerivationFailed;
+        }
 
-        Span<byte> encrypted = stackalloc byte[keySize];
+        Span<byte> encrypted = stackalloc byte[DefaultKeyLengthBits];
+        int writtenBytes;
+        try
+        {
+            using var aes = Aes.Create();
+            aes.Key = binaryHash;
+            writtenBytes = aes.EncryptCbc(binaryKey, binarySalt[..(AesMaxIvSize / BitsPerByte)], encrypted);
+        }
+        catch (CryptographicException e)
+        {
+            LogCryptographicException(e);
+            return CryptographyError.EncryptionFailed;
+        }
 
-        using var aes = Aes.Create();
-        aes.Key = binaryHash;
-        var writtenBytes = aes.EncryptCbc(binaryKey, binarySalt[..(AesMaxIvSize / BitsPerByte)], encrypted);
-
-        return new CreateKeyResult(
-            Salt: Convert.ToBase64String(binarySalt),
-            EncryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]));
+        return _phcStringParser.Create(
+            salt: Convert.ToBase64String(binarySalt),
+            encryptedKey: Convert.ToBase64String(encrypted[..writtenBytes]),
+            iterations: DefaultIterations,
+            keyLengthBits: DefaultKeyLengthBits);
     }
 
-    public Result<string, GetKeyError> TryGetKey(
-        string password,
-        string salt,
-        string encryptedKey,
-        int keySize,
-        int iterations)
+    public Result<string, GetKeyError> TryGetKey(string password, string passwordHash)
     {
-        Span<byte> binarySalt = stackalloc byte[keySize / BitsPerByte];
-        if (!Convert.TryFromBase64Chars(salt, binarySalt, out var saltBytes) || saltBytes != binarySalt.Length)
-        {
-            return GetKeyError.InvalidSalt;
-        }
+        return from phcString in _phcStringParser.Parse(passwordHash)
+               from key in DecryptKey(password, phcString)
+               select key;
+    }
 
-        Span<byte> binaryEncrypted = stackalloc byte[keySize];
-        if (!Convert.TryFromBase64Chars(encryptedKey, binaryEncrypted, out var encryptedBytes))
-        {
-            return GetKeyError.InvalidEncryptedKey;
-        }
+    private Result<string, GetKeyError> DecryptKey(string password, Pbkdf2PhcString phcString)
+    {
+        var keyLengthBytes = phcString.KeyLengthBits / BitsPerByte;
+
+        Span<byte> binarySalt = stackalloc byte[keyLengthBytes];
+        if (!Convert.TryFromBase64Chars(phcString.Salt, binarySalt, out var saltBytes) || saltBytes != binarySalt.Length)
+            return GetKeyError.InvalidPassword;
+
+        Span<byte> binaryEncrypted = stackalloc byte[phcString.KeyLengthBits];
+        if (!Convert.TryFromBase64Chars(phcString.EncryptedKey, binaryEncrypted, out var encryptedBytes))
+            return GetKeyError.InvalidPassword;
 
         var binaryHash = new byte[AesMaxKeySize / BitsPerByte];
-        Rfc2898DeriveBytes.Pbkdf2(password, binarySalt, binaryHash, iterations, s_hashAlgorithmName);
+        try
+        {
+            Rfc2898DeriveBytes.Pbkdf2(password, binarySalt, binaryHash, phcString.Iterations, s_hashAlgorithmName);
+        }
+        catch (CryptographicException e)
+        {
+            LogCryptographicException(e);
+            return GetKeyError.InvalidPassword;
+        }
 
-        Span<byte> binaryKey = stackalloc byte[keySize / BitsPerByte];
+        Span<byte> binaryKey = stackalloc byte[keyLengthBytes];
 
         Aes? aes = null;
         try
@@ -95,6 +127,6 @@ public sealed partial class Pbkdf2KeyDerivation : IKeyDerivation
         }
     }
 
-    [LoggerMessage(LogLevel.Error, "Error decrypting CBC")]
+    [LoggerMessage(LogLevel.Error, "Error during cryptographic operation")]
     private partial void LogCryptographicException(CryptographicException exception);
 }

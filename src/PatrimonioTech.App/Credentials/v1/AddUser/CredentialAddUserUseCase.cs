@@ -1,4 +1,4 @@
-﻿using PatrimonioTech.App.Database;
+using PatrimonioTech.App.Database;
 using PatrimonioTech.Domain.Credentials;
 using PatrimonioTech.Domain.Credentials.Actions.AddUser;
 using PatrimonioTech.Domain.Credentials.Services;
@@ -18,12 +18,12 @@ public sealed class CredentialAddUserUseCase(
         CancellationToken cancellationToken)
     {
         return from scnRes in addUserScenario
-                .Execute(new AddUserCredential(request.Name, request.Password, request.KeySize, request.Iterations))
+                .Execute(new AddUserCredential(request.Name, request.Password))
                 .MapErr(CredentialAddUserError.BusinessError.λ)
                 .ToTask()
             let model = UserCredential.Create(scnRes)
             from key in keyDerivation
-                .TryGetKey(request.Password, model.Salt, model.Key, model.KeySize, model.Iterations)
+                .TryGetKey(request.Password, model.PasswordHash)
                 .MapErr(CredentialAddUserError.CryptographyError.λ)
                 .ToTask()
             from db in databaseAdmin.CreateDatabase(model.Database, key)
